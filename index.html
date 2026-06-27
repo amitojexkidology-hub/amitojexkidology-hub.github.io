@@ -12,12 +12,15 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
-    --bg:#eef1f8; --card:#ffffff; --ink:#15182b; --muted:#6b7192; --line:#e7eaf3;
-    --purple:#6c4ce0; --indigo:#4f46e5; --teal:#14b8a6; --coral:#ff6b6b;
-    --amber:#f59e0b; --blue:#3b82f6; --green:#22c55e; --pink:#ec4899; --sky:#0ea5e9;
-    --good:#16a34a; --watch:#d97706; --alert:#dc2626; --star:#7c3aed;
-    --shadow:0 6px 22px rgba(30,28,80,.08); --shadow-lg:0 14px 40px rgba(30,28,80,.14);
-    --r:18px;
+    --bg:#f3f5f8; --card:#ffffff; --ink:#0f1b2d; --muted:#64748b; --line:#e4e8ef;
+    /* refined, muted corporate palette (variable names kept for chart code) */
+    --purple:#4b57a8; --indigo:#36417e; --teal:#0e8f86; --coral:#d4564b;
+    --amber:#c98a2b; --blue:#2563eb; --green:#1f9d57; --pink:#8a4f9e; --sky:#1f7fb6;
+    --good:#15803d; --watch:#b45309; --alert:#b91c1c; --star:#4338ca;
+    --navy:#11243f; --navy2:#1b3a63;
+    --shadow:0 1px 2px rgba(15,27,45,.05), 0 4px 14px rgba(15,27,45,.06);
+    --shadow-lg:0 10px 30px rgba(15,27,45,.12);
+    --r:13px;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -32,26 +35,38 @@
 
   /* ---------- header ---------- */
   header.hero{
-    background:linear-gradient(120deg,#5b2be0 0%,#7c3aed 38%,#d6326b 78%,#ff7a45 100%);
-    color:#fff; padding:22px 0 70px; position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#0e1f38 0%,#13294b 55%,#1b3a63 100%);
+    color:#fff; padding:20px 0 66px; position:relative; overflow:hidden;
+    border-bottom:3px solid #2563eb;
   }
-  header.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;
-    background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);border-radius:50%}
-  .hero-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .logo{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.16);
-    display:grid;place-items:center;font-size:26px;backdrop-filter:blur(4px);
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
-  .brandname{font-size:24px;font-weight:800;letter-spacing:.2px;line-height:1}
-  .brandsub{font-size:12.5px;opacity:.9;margin-top:3px}
+  header.hero::after{content:"";position:absolute;right:-80px;top:-90px;width:320px;height:320px;
+    background:radial-gradient(circle,rgba(37,99,235,.28),transparent 68%);border-radius:50%}
+  .hero-top{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+  .logo-chip{background:#fff;border-radius:10px;padding:6px 11px;display:flex;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.22)}
+  .logo-chip img{height:30px;display:block}
+  .amz-logo{height:26px;border-radius:5px;margin-bottom:5px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  .brandname{font-size:23px;font-weight:700;letter-spacing:.2px;line-height:1}
+  .brandsub{font-size:12px;opacity:.8;margin-top:4px;letter-spacing:.3px;text-transform:uppercase;font-weight:500}
   .hero-meta{margin-left:auto;text-align:right;font-size:12px;opacity:.95}
   .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);
     padding:5px 11px;border-radius:999px;font-size:12px;font-weight:600;margin-top:6px}
   .dot{width:8px;height:8px;border-radius:50%;background:#7CFFB2;box-shadow:0 0 0 4px rgba(124,255,178,.25)}
-  .hero-h{margin:18px 0 2px;font-size:15px;font-weight:600;opacity:.95}
-  .period-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
-  select.period{font-family:inherit;font-weight:600;font-size:13px;color:#3a1c8a;
-    border:none;border-radius:10px;padding:8px 12px;background:#fff;box-shadow:var(--shadow)}
-  .prov{font-size:11.5px;background:rgba(0,0,0,.18);padding:5px 10px;border-radius:8px}
+  .hero-h{margin:18px 0 6px;font-size:11px;font-weight:600;opacity:.7;letter-spacing:.6px;text-transform:uppercase}
+  .period-row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:2px}
+  .ctrl-seg{display:inline-flex;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+    border-radius:9px;padding:3px}
+  .ctrl-seg button{font:inherit;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.85);
+    background:transparent;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;transition:.15s}
+  .ctrl-seg button.on{background:#fff;color:var(--navy)}
+  select.period{font-family:inherit;font-weight:600;font-size:13px;color:var(--navy);
+    border:none;border-radius:8px;padding:8px 12px;background:#fff;box-shadow:var(--shadow);max-width:300px}
+  .rangebox{display:none;align-items:center;gap:6px}
+  .rangebox.show{display:inline-flex}
+  .dt{font:inherit;font-size:12.5px;border:none;border-radius:8px;padding:7px 9px;color:var(--navy)}
+  .rsep{opacity:.7}
+  .mini-btn{font:inherit;font-size:12.5px;font-weight:700;border:none;border-radius:8px;padding:7px 13px;
+    cursor:pointer;background:#2563eb;color:#fff}
+  .prov{font-size:11px;background:rgba(255,255,255,.12);padding:5px 10px;border-radius:7px;opacity:.92}
 
   /* ---------- tabs ---------- */
   nav.tabs{position:sticky;top:0;z-index:30;background:rgba(238,241,248,.86);
@@ -61,7 +76,7 @@
   .tabs-in::-webkit-scrollbar{display:none}
   .tab{white-space:nowrap;border:1px solid var(--line);background:#fff;color:var(--muted);
     font-weight:600;font-size:13.5px;padding:9px 15px;border-radius:999px;cursor:pointer;transition:.15s}
-  .tab.active{background:linear-gradient(120deg,var(--purple),var(--pink));color:#fff;border-color:transparent;box-shadow:var(--shadow)}
+  .tab.active{background:var(--navy);color:#fff;border-color:transparent;box-shadow:var(--shadow)}
 
   main{margin-top:-46px}
   section.view{display:none;animation:fade .25s ease}
@@ -72,11 +87,11 @@
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   .kpi{background:var(--card);border-radius:var(--r);padding:16px 16px 14px;box-shadow:var(--shadow);
     position:relative;overflow:hidden;border:1px solid var(--line)}
-  .kpi .lab{font-size:12px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:7px}
-  .kpi .val{font-family:'Poppins';font-weight:800;font-size:26px;margin-top:7px;line-height:1.05}
+  .kpi .lab{font-size:11px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:7px;letter-spacing:.4px;text-transform:uppercase}
+  .kpi .val{font-family:'Poppins';font-weight:700;font-size:25px;margin-top:8px;line-height:1.05;color:var(--ink)}
   .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:5px}
-  .kpi .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:14px;color:#fff}
-  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+  .kpi .ic{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
   .kpi.c-spend::before{background:var(--coral)} .kpi.c-spend .ic{background:var(--coral)}
   .kpi.c-sales::before{background:var(--teal)} .kpi.c-sales .ic{background:var(--teal)}
   .kpi.c-total::before{background:var(--indigo)} .kpi.c-total .ic{background:var(--indigo)}
@@ -101,6 +116,23 @@
   .seg button{border:none;background:transparent;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);
     padding:7px 12px;border-radius:8px;cursor:pointer}
   .seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .fsel{font:inherit;font-size:13px;font-weight:600;color:var(--ink);border:1px solid var(--line);
+    border-radius:11px;padding:10px 13px;background:#fff;min-width:170px}
+  .camp-group{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+    margin-bottom:12px;overflow:hidden}
+  .camp-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fafbfd;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .camp-head .pname{font-family:'Poppins';font-weight:600;font-size:14px}
+  .camp-head .pasin{font-size:11px;color:var(--muted)}
+  .camp-head .pcount{margin-left:auto;font-size:11.5px;color:var(--muted);font-weight:600}
+  .camp-row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid #f1f3f7;font-size:13px}
+  .camp-row:last-child{border-bottom:none}
+  .camp-row .cn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .camp-row .cm{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;white-space:nowrap}
+  .ctype{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#eef1f7;color:#475569}
+  .ctype.Auto{background:#e8f1ff;color:#2563eb} .ctype.Video{background:#fdeaf2;color:#b5417f}
+  .ctype.PT{background:#eafaf3;color:#15803d} .ctype.Exact{background:#fff2e0;color:#b45309}
+  .ctype.Manual{background:#eef0f7;color:#4b57a8} .ctype.SB{background:#ede9fe;color:#6d28d9}
+  .pendline{padding:9px 16px;font-size:11.5px;color:var(--muted);background:#fffdf5}
   .tablewrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line);background:#fff;box-shadow:var(--shadow)}
   table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
   thead th{position:sticky;top:0;background:#fafbff;text-align:right;padding:12px 12px;font-weight:700;
@@ -115,6 +147,8 @@
   .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
   .b-star{background:#f1ecff;color:var(--star)} .b-good{background:#e7f8ee;color:var(--good)}
   .b-watch{background:#fff4e3;color:var(--watch)} .b-alert{background:#fdeaea;color:var(--alert)}
+  .delx{margin-left:8px;border:none;background:#f1f3f7;color:#9aa3b2;width:20px;height:20px;border-radius:5px;cursor:pointer;font-size:14px;line-height:1;vertical-align:middle}
+  .delx:hover{background:#fde8e8;color:#dc2626}
   .chan{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:5px;padding:1px 5px;margin-left:3px}
   .chan.SP{background:var(--blue)} .chan.SB{background:var(--purple)} .chan.SD{background:var(--teal)}
 
@@ -160,9 +194,9 @@
   .ucfg{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:14px}
   .ucfg label{font-size:11.5px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
   .ucfg input,.ucfg select{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:9px 11px}
-  .btn{font:inherit;font-weight:700;font-size:14px;border:none;border-radius:12px;padding:11px 20px;cursor:pointer;color:#fff;
-    background:linear-gradient(120deg,var(--purple),var(--pink));box-shadow:var(--shadow)}
-  .btn.ghost{background:#fff;color:var(--purple);border:1px solid #ddd4f5;box-shadow:none}
+  .btn{font:inherit;font-weight:700;font-size:14px;border:none;border-radius:10px;padding:11px 20px;cursor:pointer;color:#fff;
+    background:var(--blue);box-shadow:var(--shadow)}
+  .btn.ghost{background:#fff;color:var(--blue);border:1px solid #cdd9f5;box-shadow:none}
   .btn:disabled{opacity:.5;cursor:not-allowed}
   .ulog{margin-top:14px;background:#0f1226;color:#c8f7d8;border-radius:12px;padding:12px 14px;font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;
     max-height:200px;overflow:auto;display:none}
@@ -189,32 +223,45 @@
 <header class="hero">
   <div class="wrap">
     <div class="hero-top">
-      <div class="logo">🧸</div>
+      <div class="logo-chip"><img id="brandLogo" alt="Kidology" /></div>
       <div>
-        <div class="brandname">Kidology</div>
-        <div class="brandsub">Amazon Ads — Live Performance Dashboard</div>
+        <div class="brandsub" style="font-size:13px;margin-top:0">Amazon Ads · Performance Dashboard</div>
       </div>
       <div class="hero-meta">
-        <div>Managed by <b id="mgr">Amitoje Bakshi</b></div>
+        <img id="amazonLogo" class="amz-logo" alt="Amazon Ads" />
+        <div>Account manager · <b id="mgr">Amitoje Bakshi</b></div>
         <div class="pill"><span class="dot"></span><span id="freshness">Updated —</span></div>
       </div>
     </div>
-    <div class="hero-h">Reporting period</div>
+    <div class="hero-h">View</div>
     <div class="period-row">
+      <div class="ctrl-seg" id="viewMode">
+        <button data-m="period" class="on">Periods</button>
+        <button data-m="day">Day-wise</button>
+        <button data-m="range">Custom range</button>
+      </div>
       <select class="period" id="periodSel"></select>
-      <span class="prov" id="provNote">ⓘ Latest period may be provisional — Amazon finalises data over ~1–3 days.</span>
+      <span id="rangeCtrls" class="rangebox">
+        <input type="date" id="rangeStart" class="dt" />
+        <span class="rsep">→</span>
+        <input type="date" id="rangeEnd" class="dt" />
+        <button class="mini-btn" id="rangeApply">Apply</button>
+      </span>
+      <span class="prov" id="provNote">Latest period may be provisional — Amazon finalises data over ~1–3 days.</span>
     </div>
   </div>
 </header>
 
 <nav class="tabs">
   <div class="tabs-in" id="tabbar">
-    <button class="tab active" data-v="overview">📊 Overview</button>
-    <button class="tab" data-v="products">📦 Products</button>
-    <button class="tab" data-v="insights">💡 Insights</button>
-    <button class="tab" data-v="alerts">🚨 Alerts <span id="alertCount"></span></button>
-    <button class="tab" data-v="compare">🔀 Compare</button>
-    <button class="tab" data-v="upload">⬆️ Upload data</button>
+    <button class="tab active" data-v="overview">Overview</button>
+    <button class="tab" data-v="products">Products</button>
+    <button class="tab" data-v="campaigns">Campaigns</button>
+    <button class="tab" data-v="forecast">Forecast</button>
+    <button class="tab" data-v="insights">Insights</button>
+    <button class="tab" data-v="alerts">Alerts <span id="alertCount"></span></button>
+    <button class="tab" data-v="compare">Compare</button>
+    <button class="tab" data-v="upload">Upload data</button>
   </div>
 </nav>
 
@@ -259,6 +306,7 @@
         <button data-f="watch">Watch</button>
         <button data-f="good">Healthy</button>
       </div>
+      <button class="mini-btn" id="addProdBtn" style="border-radius:11px;padding:10px 14px">+ Add product</button>
     </div>
     <div class="tablewrap">
       <table id="ptable">
@@ -280,6 +328,15 @@
     </div>
   </section>
 
+  <!-- CAMPAIGNS -->
+  <section class="view" id="v-campaigns">
+    <div class="toolbar">
+      <input class="search" id="campSearch" placeholder="Search campaign or product…" />
+      <select class="fsel" id="campProd"></select>
+    </div>
+    <div id="campWrap"></div>
+  </section>
+
   <!-- INSIGHTS -->
   <section class="view" id="v-insights">
     <div class="card" style="margin-bottom:14px">
@@ -292,6 +349,20 @@
   <!-- ALERTS -->
   <section class="view" id="v-alerts">
     <div id="alertWrap"></div>
+  </section>
+
+  <!-- FORECAST -->
+  <section class="view" id="v-forecast">
+    <div class="card" style="margin-bottom:14px">
+      <h3>Sales forecast</h3>
+      <p class="hint" id="fcNote">Projection from your daily total-sales history. Recalculates automatically whenever new daily data is uploaded.</p>
+    </div>
+    <div class="kpis" id="fcKpis"></div>
+    <div class="card" style="margin-top:14px">
+      <h3>Daily total sales — actual &amp; 30-day projection</h3>
+      <p class="hint">Solid line = actual daily sales · dashed = projected next 30 days (linear trend blended with recent 7-day run-rate).</p>
+      <div class="chartbox" style="height:340px"><canvas id="chForecast"></canvas></div>
+    </div>
   </section>
 
   <!-- COMPARE -->
@@ -344,36 +415,1555 @@
 </main>
 
 <script>
-// Auto-generated by scripts/build_data.py - do not edit by hand.
+// brand logos as data URIs
+window.LOGOS = {"kidology": "data:image/jpeg;base64,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", "amazon": "data:image/png;base64,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"};
+
+</script>
+<script>
+// Auto-generated by scripts/build_v3.py
 window.DASHBOARD_DATA = {
  "brand": {
   "name": "Kidology",
   "manager": "Amitoje Bakshi"
  },
  "meta": {
-  "generatedAt": "2026-06-20",
-  "latestId": "2026-06-01_2026-06-20",
-  "currency": "INR"
+  "generatedAt": "2026-06-27",
+  "latestId": "2026-06-01_2026-06-26",
+  "currency": "INR",
+  "dailyNote": "daily total sales ordered by file number (assumed Jun 1..26)"
  },
+ "productNames": {
+  "B0FYFZQJDD": "Mirror Book",
+  "B0H1H6GJG3": "Sunflower Bubble",
+  "B0G941M82L": "Fairy Wings",
+  "B0GW375CMP": "Magnetic Tiles",
+  "B0GVK9LF4D": "Lizard",
+  "B0GVKGB7N1": "English Book",
+  "B0GV4FH6MV": "Police Book",
+  "B0GW888T9B": "Dancing Duck",
+  "B0FX48DHCN": "Sassy Stacker",
+  "B0GC5DK8CW": "Baby Stacker",
+  "B0D296NGGK": "Busy Board",
+  "B0FX9J89K5": "Baby Carry Bag",
+  "B0FX9HFVH9": "Baby Carry Bag",
+  "B0FX9G7PR5": "Baby Carry Bag",
+  "B0H4B3GMRF": "Magnetic Stone",
+  "B0FX9G36HP": "Smoke Drift Car",
+  "B0D7SPNLMQ": "Flying Car",
+  "B0F6NR3VGY": "Fruit Teether",
+  "B0GVS3DX6R": "Nail Art (Low Rev)",
+  "B0GN1F7J7G": "Nail Art (High Rev)",
+  "B0DRVLH61R": "5-in-1 Robot",
+  "B0DRVK24MF": "5-in-1 Robot",
+  "B0DRVJW2ZB": "5-in-1 Robot",
+  "B0DRMDWVRH": "5-in-1 Robot",
+  "B0DR8GVQ24": "5-in-1 Robot"
+ },
+ "daily": [
+  {
+   "date": "2026-06-01",
+   "totalSales": 120877.9,
+   "totalOrders": 171
+  },
+  {
+   "date": "2026-06-02",
+   "totalSales": 111840.91,
+   "totalOrders": 160
+  },
+  {
+   "date": "2026-06-03",
+   "totalSales": 112497.82,
+   "totalOrders": 153
+  },
+  {
+   "date": "2026-06-04",
+   "totalSales": 138268.9,
+   "totalOrders": 184
+  },
+  {
+   "date": "2026-06-05",
+   "totalSales": 117046.89,
+   "totalOrders": 155
+  },
+  {
+   "date": "2026-06-06",
+   "totalSales": 110552.95,
+   "totalOrders": 154
+  },
+  {
+   "date": "2026-06-07",
+   "totalSales": 112398.89,
+   "totalOrders": 155
+  },
+  {
+   "date": "2026-06-08",
+   "totalSales": 112602.89,
+   "totalOrders": 148
+  },
+  {
+   "date": "2026-06-09",
+   "totalSales": 119852.89,
+   "totalOrders": 148
+  },
+  {
+   "date": "2026-06-10",
+   "totalSales": 114241.94,
+   "totalOrders": 140
+  },
+  {
+   "date": "2026-06-11",
+   "totalSales": 146718.88,
+   "totalOrders": 164
+  },
+  {
+   "date": "2026-06-12",
+   "totalSales": 107487.91,
+   "totalOrders": 131
+  },
+  {
+   "date": "2026-06-13",
+   "totalSales": 121258.92,
+   "totalOrders": 140
+  },
+  {
+   "date": "2026-06-14",
+   "totalSales": 145214.89,
+   "totalOrders": 159
+  },
+  {
+   "date": "2026-06-15",
+   "totalSales": 127546.89,
+   "totalOrders": 151
+  },
+  {
+   "date": "2026-06-16",
+   "totalSales": 121453.84,
+   "totalOrders": 150
+  },
+  {
+   "date": "2026-06-17",
+   "totalSales": 115760.86,
+   "totalOrders": 137
+  },
+  {
+   "date": "2026-06-18",
+   "totalSales": 136875.39,
+   "totalOrders": 170
+  },
+  {
+   "date": "2026-06-19",
+   "totalSales": 121398.82,
+   "totalOrders": 161
+  },
+  {
+   "date": "2026-06-20",
+   "totalSales": 129631.87,
+   "totalOrders": 173
+  },
+  {
+   "date": "2026-06-21",
+   "totalSales": 121199.48,
+   "totalOrders": 153
+  },
+  {
+   "date": "2026-06-22",
+   "totalSales": 119900.86,
+   "totalOrders": 157
+  },
+  {
+   "date": "2026-06-23",
+   "totalSales": 123179.98,
+   "totalOrders": 168
+  },
+  {
+   "date": "2026-06-24",
+   "totalSales": 108158.46,
+   "totalOrders": 144
+  },
+  {
+   "date": "2026-06-25",
+   "totalSales": 117383.94,
+   "totalOrders": 165
+  },
+  {
+   "date": "2026-06-26",
+   "totalSales": 128314.55,
+   "totalOrders": 175
+  }
+ ],
  "history": [
   {
-   "id": "2026-06-01_2026-06-20",
-   "label": "Jun 1-20",
+   "id": "2026-05-01_2026-05-31",
+   "label": "May 2026",
+   "start": "2026-05-01",
+   "end": "2026-05-31",
+   "kind": "period",
+   "products": [
+    {
+     "asin": "B0GC5DK8CW",
+     "sku": "KD-BABYSTACKER-051",
+     "title": "",
+     "spend": 3045.840000000001,
+     "adSales": 7460.92,
+     "adOrders": 15,
+     "impr": 59366,
+     "clicks": 335,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SD",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FX48DHCN",
+     "sku": "KD-SASSYSTACKER-041",
+     "title": "",
+     "spend": 4483.72,
+     "adSales": 13153.21,
+     "adOrders": 28,
+     "impr": 113238,
+     "clicks": 461,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SD",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GVK9LF4D",
+     "sku": "KD-LIZARD-GR-027",
+     "title": "",
+     "spend": 35916.01000000001,
+     "adSales": 234492.6699999998,
+     "adOrders": 192,
+     "impr": 401810,
+     "clicks": 6908,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GW375CMP",
+     "sku": "KD-MGTTILES-42P-004",
+     "title": "",
+     "spend": 38255.84000000001,
+     "adSales": 313292.4300000001,
+     "adOrders": 351,
+     "impr": 377165,
+     "clicks": 4033,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GV4FH6MV",
+     "sku": "KD-POLICEBOOK-054",
+     "title": "",
+     "spend": 25003.09,
+     "adSales": 114291.30999999994,
+     "adOrders": 174,
+     "impr": 498305,
+     "clicks": 3049,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GVKGB7N1",
+     "sku": "KD-ENGWORD-035",
+     "title": "",
+     "spend": 11000.979999999998,
+     "adSales": 60150.280000000006,
+     "adOrders": 63,
+     "impr": 103523,
+     "clicks": 1125,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GVS3DX6R",
+     "sku": "KD-NAILMARKER-082",
+     "title": "",
+     "spend": 15821.130000000006,
+     "adSales": 53660.26000000001,
+     "adOrders": 104,
+     "impr": 105006,
+     "clicks": 1782,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GN1F7J7G",
+     "sku": "KD-NAILMARKER-692",
+     "title": "",
+     "spend": 175685.94,
+     "adSales": 1025125.4599999997,
+     "adOrders": 1942,
+     "impr": 1445201,
+     "clicks": 30295,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GW888T9B",
+     "sku": "KD-DUCK-YL-004",
+     "title": "",
+     "spend": 16112.080000000004,
+     "adSales": 60625.549999999996,
+     "adOrders": 76,
+     "impr": 295636,
+     "clicks": 2416,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0F6NR3VGY",
+     "sku": "KD-FRUITTEETHER-P5-331",
+     "title": "",
+     "spend": 4384.59,
+     "adSales": 18679.920000000002,
+     "adOrders": 66,
+     "impr": 96122,
+     "clicks": 723,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0G941M82L",
+     "sku": "KD-FAIRYWINGS-087",
+     "title": "",
+     "spend": 7595.19,
+     "adSales": 39214.259999999995,
+     "adOrders": 23,
+     "impr": 168807,
+     "clicks": 1568,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0H1H6GJG3",
+     "sku": "KD-FLRBBBL-803",
+     "title": "",
+     "spend": 3357.9300000000007,
+     "adSales": 21071.399999999998,
+     "adOrders": 25,
+     "impr": 79298,
+     "clicks": 592,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0D7SPNLMQ",
+     "sku": "KD-FLYINGCAR-BL-45",
+     "title": "",
+     "spend": 44978.07,
+     "adSales": 128592.36999999997,
+     "adOrders": 158,
+     "impr": 975401,
+     "clicks": 8483,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FYFZQJDD",
+     "sku": "KD-MIRRORBOOK-WTH-D1-591",
+     "title": "",
+     "spend": 5476.169999999999,
+     "adSales": 25267.460000000014,
+     "adOrders": 52,
+     "impr": 101210,
+     "clicks": 769,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DRMDWVRH",
+     "sku": "KD-5IN1-METALENGINEER-YL-53-New",
+     "title": "",
+     "spend": 816.73,
+     "adSales": 3653.3199999999997,
+     "adOrders": 4,
+     "impr": 26882,
+     "clicks": 193,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DR8GVQ24",
+     "sku": "KD-5IN1-METALFIRE-RD-53",
+     "title": "",
+     "spend": 635.77,
+     "adSales": 951.43,
+     "adOrders": 1,
+     "impr": 12679,
+     "clicks": 142,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DRVK24MF",
+     "sku": "KD-5IN1-DINOSAUR-53",
+     "title": "",
+     "spend": 1043.8100000000002,
+     "adSales": 2567.61,
+     "adOrders": 3,
+     "impr": 39567,
+     "clicks": 249,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DRVLH61R",
+     "sku": "KD-5IN1-CONSTRUCTION-YL-53",
+     "title": "",
+     "spend": 2228.3,
+     "adSales": 3329.5299999999997,
+     "adOrders": 4,
+     "impr": 163258,
+     "clicks": 727,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DRVJW2ZB",
+     "sku": "KD-5IN1-FIRE-RD-53",
+     "title": "",
+     "spend": 871.6899999999999,
+     "adSales": 3504.71,
+     "adOrders": 5,
+     "impr": 20229,
+     "clicks": 207,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0D296NGGK",
+     "sku": "KD-BUSYBOARD-DOUBLESIDE-33",
+     "title": "",
+     "spend": 0.0,
+     "adSales": 0.0,
+     "adOrders": 0,
+     "impr": 0,
+     "clicks": 0,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": []
+    },
+    {
+     "asin": "B0H4B3GMRF",
+     "sku": "KD-OCTAGON-S20",
+     "title": "",
+     "spend": 0.0,
+     "adSales": 0.0,
+     "adOrders": 0,
+     "impr": 0,
+     "clicks": 0,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": []
+    },
+    {
+     "asin": "B0FX9G36HP",
+     "sku": "KD-SMOKEDRIFTCAR-RD-093",
+     "title": "",
+     "spend": 0.0,
+     "adSales": 0.0,
+     "adOrders": 0,
+     "impr": 0,
+     "clicks": 0,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SB"
+     ]
+    },
+    {
+     "asin": "B0FX9J89K5",
+     "sku": "KD-CARRYBAG-BR-071",
+     "title": "",
+     "spend": 125.66,
+     "adSales": 315.24,
+     "adOrders": 1,
+     "impr": 4700,
+     "clicks": 25,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FX9HFVH9",
+     "sku": "KD-CARRYBAG-YL-071",
+     "title": "",
+     "spend": 30.380000000000003,
+     "adSales": 0.0,
+     "adOrders": 0,
+     "impr": 2257,
+     "clicks": 7,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FX9G7PR5",
+     "sku": "KD-CARRYBAG-BU-071",
+     "title": "",
+     "spend": 0.0,
+     "adSales": 0.0,
+     "adOrders": 0,
+     "impr": 0,
+     "clicks": 0,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": []
+    }
+   ],
+   "campaigns": [
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) HIGH (low) Rev B0GN1F7J7G",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 56039.97,
+     "sales": 369895.92,
+     "orders": 695,
+     "impr": 345882,
+     "clicks": 8915
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) High Rev B0GN1F7J7G",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 52184.99,
+     "sales": 370973.02,
+     "orders": 714,
+     "impr": 242690,
+     "clicks": 8285
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- PT- High Rev) B0GN1F7J7G",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 37957.86,
+     "sales": 158662.62,
+     "orders": 300,
+     "impr": 131323,
+     "clicks": 5712
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Auto- High rev)",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 35159.52,
+     "sales": 138521.58,
+     "orders": 257,
+     "impr": 760794,
+     "clicks": 7905
+    },
+    {
+     "name": "HC_ Flying Car (Video) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SB"
+     ],
+     "spend": 22838.86,
+     "sales": 46630.01,
+     "orders": 59,
+     "impr": 320650,
+     "clicks": 4656
+    },
+    {
+     "name": "Busy Board Switch Board  GR video B0DSSR162H",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SB"
+     ],
+     "spend": 14925.18,
+     "sales": 80047.22,
+     "orders": 121,
+     "impr": 370735,
+     "clicks": 2484
+    },
+    {
+     "name": "HC_ Flying Car (Manual- Exact/Phrase/Broad) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 13516.34,
+     "sales": 41966.86,
+     "orders": 51,
+     "impr": 394025,
+     "clicks": 2151
+    },
+    {
+     "name": "KD_ Lizard (Manual- PT) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 11209.81,
+     "sales": 77729.65,
+     "orders": 61,
+     "impr": 107982,
+     "clicks": 1829
+    },
+    {
+     "name": "KD_ Magnetic Tiles (Manual- PT) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 10962.8,
+     "sales": 78589.49,
+     "orders": 91,
+     "impr": 53256,
+     "clicks": 928
+    },
+    {
+     "name": "KD_ Magnetic Tiles (Manual- Broad Phrase) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 10715.39,
+     "sales": 124091.49,
+     "orders": 129,
+     "impr": 103319,
+     "clicks": 1196
+    },
+    {
+     "name": "KD_ Police Book (Video) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SB"
+     ],
+     "spend": 9395.52,
+     "sales": 41802.14,
+     "orders": 64,
+     "impr": 109586,
+     "clicks": 1307
+    },
+    {
+     "name": "English Word Book Manual  B0GVKGB7N1",
+     "asin": "B0GVKGB7N1",
+     "product": "English Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 8955.5,
+     "sales": 48874.11,
+     "orders": 53,
+     "impr": 85350,
+     "clicks": 891
+    },
+    {
+     "name": "KD_ Lizard (Auto) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 8304.23,
+     "sales": 43977.1,
+     "orders": 41,
+     "impr": 148401,
+     "clicks": 2360
+    },
+    {
+     "name": "KD_ Magnetic Tiles (Auto) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 8172.7,
+     "sales": 57970.5,
+     "orders": 67,
+     "impr": 125689,
+     "clicks": 1059
+    },
+    {
+     "name": "Robot Police Car",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SP"
+     ],
+     "spend": 7464.45,
+     "sales": 30271.88,
+     "orders": 34,
+     "impr": 62284,
+     "clicks": 1157
+    },
+    {
+     "name": "KD_ Lizard (Manual- Exact) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 7420.67,
+     "sales": 57821.06,
+     "orders": 43,
+     "impr": 52780,
+     "clicks": 1117
+    },
+    {
+     "name": "KD_ Police Book (Auto) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 6703.65,
+     "sales": 40874.16,
+     "orders": 60,
+     "impr": 269848,
+     "clicks": 812
+    },
+    {
+     "name": "KD_ Lizard (Manual- Broad/Phrase) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 6656.47,
+     "sales": 49492.47,
+     "orders": 42,
+     "impr": 58404,
+     "clicks": 1140
+    },
+    {
+     "name": "KD_ Magnetic Tiles (Manual- Exact) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 6567.33,
+     "sales": 42446.69,
+     "orders": 50,
+     "impr": 64580,
+     "clicks": 627
+    },
+    {
+     "name": "HC_ Flying Car (PT) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 6541.11,
+     "sales": 29866.96,
+     "orders": 35,
+     "impr": 137012,
+     "clicks": 1195
+    },
+    {
+     "name": "Naveen-Duck-KT(Storio Amazon PI KWD) B0GW888T9B",
+     "asin": "B0GW888T9B",
+     "product": "Dancing Duck",
+     "channels": [
+      "SP"
+     ],
+     "spend": 6454.46,
+     "sales": 15198.06,
+     "orders": 18,
+     "impr": 118939,
+     "clicks": 744
+    },
+    {
+     "name": "HC_Dancing Duck (Auto) B0GW888T9B",
+     "asin": "B0GW888T9B",
+     "product": "Dancing Duck",
+     "channels": [
+      "SP"
+     ],
+     "spend": 6296.69,
+     "sales": 26953.28,
+     "orders": 36,
+     "impr": 151404,
+     "clicks": 901
+    },
+    {
+     "name": "KD_ Police Book (Manual- Broad/Phrase) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 4915.83,
+     "sales": 15626.54,
+     "orders": 26,
+     "impr": 86466,
+     "clicks": 522
+    },
+    {
+     "name": "Fairy Wings Manual B0G941M82L",
+     "asin": "B0G941M82L",
+     "product": "Fairy Wings",
+     "channels": [
+      "SP"
+     ],
+     "spend": 4553.4,
+     "sales": 27793.31,
+     "orders": 17,
+     "impr": 78269,
+     "clicks": 807
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Auto- Low rev) B0GVS3DX6R",
+     "asin": "B0GVS3DX6R",
+     "product": "Nail Art (Low Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3871.16,
+     "sales": 16254.36,
+     "orders": 33,
+     "impr": 30057,
+     "clicks": 514
+    },
+    {
+     "name": "SB_HC_Dancing Duck (Video) B0GW888T9B",
+     "asin": "B0GW888T9B",
+     "product": "Dancing Duck",
+     "channels": [
+      "SB"
+     ],
+     "spend": 3360.93,
+     "sales": 18474.21,
+     "orders": 22,
+     "impr": 25293,
+     "clicks": 771
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- PT- Low Rev)",
+     "asin": "B0GVS3DX6R",
+     "product": "Nail Art (Low Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3339.83,
+     "sales": 10077.2,
+     "orders": 18,
+     "impr": 9824,
+     "clicks": 405
+    },
+    {
+     "name": "KD_ Police Book (Manual- PT) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3303.46,
+     "sales": 13306.57,
+     "orders": 20,
+     "impr": 26715,
+     "clicks": 341
+    },
+    {
+     "name": "Sassy stacker  L2 B0FX48DHCN",
+     "asin": "B0FX48DHCN",
+     "product": "Sassy Stacker",
+     "channels": [
+      "SB"
+     ],
+     "spend": 2659.47,
+     "sales": 4894.23,
+     "orders": 12,
+     "impr": 58686,
+     "clicks": 253
+    },
+    {
+     "name": "Mirror Book Manual",
+     "asin": "B0FYFZQJDD",
+     "product": "Mirror Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2355.93,
+     "sales": 7003.77,
+     "orders": 15,
+     "impr": 49708,
+     "clicks": 294
+    },
+    {
+     "name": "KD_ Lizard (Video) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SB"
+     ],
+     "spend": 2324.83,
+     "sales": 5472.39,
+     "orders": 5,
+     "impr": 34243,
+     "clicks": 462
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) Low Rev B0GVS3DX6R",
+     "asin": "B0GVS3DX6R",
+     "product": "Nail Art (Low Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2287.48,
+     "sales": 12880.06,
+     "orders": 26,
+     "impr": 22311,
+     "clicks": 256
+    },
+    {
+     "name": "KD_Sunflower (Auto) B0H1H6GJG3",
+     "asin": "B0H1H6GJG3",
+     "product": "Sunflower Bubble",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2092.17,
+     "sales": 12985.69,
+     "orders": 15,
+     "impr": 54295,
+     "clicks": 363
+    },
+    {
+     "name": "HC_ Flying Car (AUTO) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2081.76,
+     "sales": 10128.54,
+     "orders": 13,
+     "impr": 123714,
+     "clicks": 481
+    },
+    {
+     "name": "KD_ Magnetic Tiles (Manual- Phrase) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1837.62,
+     "sales": 10194.26,
+     "orders": 14,
+     "impr": 30271,
+     "clicks": 223
+    },
+    {
+     "name": "Nail Trimmer new manual",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1817.62,
+     "sales": 5891.44,
+     "orders": 9,
+     "impr": 15818,
+     "clicks": 301
+    },
+    {
+     "name": "HC_ 5in1 Robot (Manual- P/B)",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1777.81,
+     "sales": 6206.61,
+     "orders": 8,
+     "impr": 40797,
+     "clicks": 408
+    },
+    {
+     "name": "HC_ 5in1 Robot (Auto)",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1748.92,
+     "sales": 6373.32,
+     "orders": 7,
+     "impr": 51397,
+     "clicks": 422
+    },
+    {
+     "name": "Clearance Montessori Busy Board Toy",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1639.35,
+     "sales": 5490.33,
+     "orders": 10,
+     "impr": 24483,
+     "clicks": 308
+    },
+    {
+     "name": "KD_ English Sound Book (Meta KWD)",
+     "asin": "B0GVKGB7N1",
+     "product": "English Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1602.99,
+     "sales": 7469.51,
+     "orders": 7,
+     "impr": 10977,
+     "clicks": 141
+    },
+    {
+     "name": "KD_ mirror book (Auto) B0FYFZQJDD",
+     "asin": "B0FYFZQJDD",
+     "product": "Mirror Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1557.97,
+     "sales": 6844.68,
+     "orders": 13,
+     "impr": 32256,
+     "clicks": 253
+    },
+    {
+     "name": "KD_ Sassy Stacker (Manual- E/P/B) B0FX48DHCN | B0GC5DK8CW",
+     "asin": "B0GC5DK8CW",
+     "product": "Baby Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1516.44,
+     "sales": 2851.41,
+     "orders": 6,
+     "impr": 24260,
+     "clicks": 140
+    },
+    {
+     "name": "HC_ 5in1 Robot Yellow (video) B0DRVLH61R",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SB"
+     ],
+     "spend": 1504.3,
+     "sales": 1426.67,
+     "orders": 2,
+     "impr": 146524,
+     "clicks": 557
+    },
+    {
+     "name": "HC_Fruit shape Teether (Manual-Phrase) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1444.95,
+     "sales": 5410.44,
+     "orders": 19,
+     "impr": 26312,
+     "clicks": 202
+    },
+    {
+     "name": "Naveen-Sassy Stacker KT-Meta/Amazon PIE KWD",
+     "asin": "B0FX48DHCN",
+     "product": "Sassy Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1432.19,
+     "sales": 4404.72,
+     "orders": 9,
+     "impr": 22121,
+     "clicks": 156
+    },
+    {
+     "name": "Fairy Wings Video B0G941M82L",
+     "asin": "B0G941M82L",
+     "product": "Fairy Wings",
+     "channels": [
+      "SB"
+     ],
+     "spend": 1374.05,
+     "sales": 1903.81,
+     "orders": 1,
+     "impr": 34651,
+     "clicks": 366
+    },
+    {
+     "name": "KD_Sunflower (Manual- Braod/Phrase) B0H1H6GJG3",
+     "asin": "B0H1H6GJG3",
+     "product": "Sunflower Bubble",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1265.76,
+     "sales": 8085.71,
+     "orders": 10,
+     "impr": 24957,
+     "clicks": 229
+    },
+    {
+     "name": "KD_ Mirror Book (PT) B0FYFZQJDD",
+     "asin": "B0FYFZQJDD",
+     "product": "Mirror Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1229.75,
+     "sales": 10390.45,
+     "orders": 21,
+     "impr": 7259,
+     "clicks": 169
+    },
+    {
+     "name": "Fairy Wings PT B0G941M82L",
+     "asin": "B0G941M82L",
+     "product": "Fairy Wings",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1005.09,
+     "sales": 6853.33,
+     "orders": 3,
+     "impr": 16882,
+     "clicks": 191
+    },
+    {
+     "name": "HC_Fruit shape Teether (Auto) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 994.12,
+     "sales": 2847.6,
+     "orders": 10,
+     "impr": 26837,
+     "clicks": 152
+    },
+    {
+     "name": "KD_ Sassy Stacker (PT) B0FX48DHCN | B0GC5DK8CW",
+     "asin": "B0GC5DK8CW",
+     "product": "Baby Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 744.45,
+     "sales": 2280.95,
+     "orders": 5,
+     "impr": 9500,
+     "clicks": 84
+    },
+    {
+     "name": "KD_ Sassy Stacker (AUTO) B0FX48DHCN | B0GC5DK8CW",
+     "asin": "B0GC5DK8CW",
+     "product": "Baby Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 709.82,
+     "sales": 4518.06,
+     "orders": 9,
+     "impr": 49196,
+     "clicks": 103
+    },
+    {
+     "name": "KD_ Police Book (Manual- Exact) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 684.63,
+     "sales": 2681.9,
+     "orders": 4,
+     "impr": 5690,
+     "clicks": 67
+    },
+    {
+     "name": "Sensory Shape Fruit Video B0FR4NC8R9",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SB"
+     ],
+     "spend": 667.47,
+     "sales": 1649.52,
+     "orders": 5,
+     "impr": 38497,
+     "clicks": 148
+    },
+    {
+     "name": "HC_Cosmetic Nail Art (Manual- Exact) Low rev B0GVS3DX6R",
+     "asin": "B0GVS3DX6R",
+     "product": "Nail Art (Low Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 666.26,
+     "sales": 1520.96,
+     "orders": 3,
+     "impr": 7326,
+     "clicks": 85
+    },
+    {
+     "name": "Fairy Wings Auto B0G941M82L",
+     "asin": "B0G941M82L",
+     "product": "Fairy Wings",
+     "channels": [
+      "SP"
+     ],
+     "spend": 662.65,
+     "sales": 2663.81,
+     "orders": 2,
+     "impr": 39005,
+     "clicks": 204
+    },
+    {
+     "name": "HC_Fruit shape Teether (Video) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SB"
+     ],
+     "spend": 593.38,
+     "sales": 3417.12,
+     "orders": 12,
+     "impr": 12087,
+     "clicks": 96
+    },
+    {
+     "name": "SP_KT_NAIL TRIMMER RK",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 576.49,
+     "sales": 1700.15,
+     "orders": 8,
+     "impr": 12097,
+     "clicks": 72
+    },
+    {
+     "name": "HC_Fruit shape Teether (Manual-PT) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 573.98,
+     "sales": 2278.08,
+     "orders": 8,
+     "impr": 10543,
+     "clicks": 90
+    },
+    {
+     "name": "HC_ 5in1 Dino Robot (video) B0DRVK24MF",
+     "asin": "B0DRVK24MF",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SB"
+     ],
+     "spend": 565.27,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 23897,
+     "clicks": 131
+    },
+    {
+     "name": "SBV-KT-Tumbling Robot B0F1BWG36Q",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SB"
+     ],
+     "spend": 543.99,
+     "sales": 1238.09,
+     "orders": 2,
+     "impr": 26518,
+     "clicks": 118
+    },
+    {
+     "name": "Nail Trimmer new PT",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 453.39,
+     "sales": 2206.67,
+     "orders": 3,
+     "impr": 4600,
+     "clicks": 110
+    },
+    {
+     "name": "Sassy Stacker PT",
+     "asin": "B0FX48DHCN",
+     "product": "Sassy Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 367.15,
+     "sales": 1664.76,
+     "orders": 2,
+     "impr": 7012,
+     "clicks": 47
+    },
+    {
+     "name": "VT Fruit Teether Video B0FCG875CK",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SB"
+     ],
+     "spend": 263.51,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 4984,
+     "clicks": 48
+    },
+    {
+     "name": "Naveen-Busy Board-KT-Meta/Amazon PIE KWDs",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 240.61,
+     "sales": 665.71,
+     "orders": 1,
+     "impr": 4026,
+     "clicks": 37
+    },
+    {
+     "name": "KD_ Baby Carry Bag (Manual) B0FX9J89K5  | B0FX9HFVH9  | B0FX9G7PR5",
+     "asin": "B0FX9J89K5",
+     "product": "Baby Carry Bag",
+     "channels": [
+      "SP"
+     ],
+     "spend": 156.04,
+     "sales": 315.24,
+     "orders": 1,
+     "impr": 6957,
+     "clicks": 32
+    },
+    {
+     "name": "Naveen-SB-Sassy Stacker-B0FX48DHCN-Video",
+     "asin": "B0FX48DHCN",
+     "product": "Sassy Stacker",
+     "channels": [
+      "SB"
+     ],
+     "spend": 100.04,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 1829,
+     "clicks": 13
+    },
+    {
+     "name": "KD_ English Sound Book (Auto)",
+     "asin": "B0GVKGB7N1",
+     "product": "English Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 92.51,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 930,
+     "clicks": 14
+    },
+    {
+     "name": "Busy Board Switch Board new design GR video B0DSSR162H",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SB"
+     ],
+     "spend": 74.77,
+     "sales": 1283.81,
+     "orders": 2,
+     "impr": 2542,
+     "clicks": 11
+    },
+    {
+     "name": "Busy Board Switch Light Game PT",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 52.61,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 400,
+     "clicks": 6
+    },
+    {
+     "name": "Busy Board Switch Light Game (Clapstore) Clearance",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 52.08,
+     "sales": 618.1,
+     "orders": 1,
+     "impr": 705,
+     "clicks": 8
+    },
+    {
+     "name": "HC_Fruit shape Teether (Manual-Broad) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 44.88,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 1095,
+     "clicks": 10
+    },
+    {
+     "name": "Busy Board Book Green PT",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 31.96,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 191,
+     "clicks": 6
+    },
+    {
+     "name": "Busy Board Switch Light D2 Manual clearance",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 16.15,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 600,
+     "clicks": 2
+    }
+   ]
+  },
+  {
+   "id": "2026-06-01_2026-06-26",
+   "label": "Jun 1-26",
    "start": "2026-06-01",
-   "end": "2026-06-20",
+   "end": "2026-06-26",
    "kind": "period",
    "products": [
     {
      "asin": "B0GC5DK8CW",
      "sku": "KD-BABYSTACKER-051",
      "title": "Kidology Ring Stacker Baby Toy for 6+ Month Old Baby | Sensory Stacking Rings with Rattle for Brain Development | Montessori Cognitive Toy for Kids 6-12 Months | Motor Skill STEM Gift Boys & Girls",
-     "spend": 1949.77,
-     "adSales": 7684.73,
-     "adOrders": 16,
-     "impr": 52446,
-     "clicks": 228,
-     "totalSales": 7485.0,
-     "totalOrders": 15,
+     "spend": 3991.48,
+     "adSales": 13007.569999999998,
+     "adOrders": 28,
+     "impr": 86065,
+     "clicks": 428,
+     "totalSales": 11976.0,
+     "totalOrders": 24,
      "channels": [
       "SD",
       "SP"
@@ -383,13 +1973,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0FX48DHCN",
      "sku": "KD-SASSYSTACKER-041",
      "title": "Kidology Ring Stacker Baby Toy for 6+ Month Old Baby | Sensory Stacking Rings with Rattle for Brain Development | Montessori Cognitive Toy for Kids 6-12 Months | Motor Skill STEM Gift Boys & Girls",
-     "spend": 3106.4,
-     "adSales": 12876.960000000001,
-     "adOrders": 26,
-     "impr": 59535,
-     "clicks": 380,
-     "totalSales": 10977.78,
-     "totalOrders": 22,
+     "spend": 6243.08,
+     "adSales": 18665.379999999997,
+     "adOrders": 39,
+     "impr": 93998,
+     "clicks": 662,
+     "totalSales": 16466.67,
+     "totalOrders": 33,
      "channels": [
       "SB",
       "SD",
@@ -400,13 +1990,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0GVK9LF4D",
      "sku": "KD-LIZARD-GR-027",
      "title": "Kidology Wall Climbing RC Lizard Toy | Remote Control Gecko that Crawls on Walls & Ceilings | 360° Stunt RC with LED Eyes | Prank & Thrill Gift for Boys & Girls",
-     "spend": 30010.409999999996,
-     "adSales": 180465.00000000006,
-     "adOrders": 155,
-     "impr": 301123,
-     "clicks": 4749,
-     "totalSales": 263141.0,
-     "totalOrders": 209,
+     "spend": 39503.6,
+     "adSales": 223636.89999999985,
+     "adOrders": 193,
+     "impr": 387277,
+     "clicks": 6241,
+     "totalSales": 307102.0,
+     "totalOrders": 244,
      "channels": [
       "SB",
       "SP"
@@ -416,13 +2006,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0GW375CMP",
      "sku": "KD-MGTTILES-42P-004",
      "title": "Kidology Magnetic Tiles for Kids (42 PCS) | Travel Set STEM Building Blocks | Educational Construction Toys for 3 4 5 Years | Colorful Blocks for Creative Play & Imaginative Learning (Multicolor)",
-     "spend": 58773.469060000025,
-     "adSales": 446177.3100000002,
-     "adOrders": 506,
-     "impr": 702393,
-     "clicks": 6271,
-     "totalSales": 762881.0,
-     "totalOrders": 771,
+     "spend": 76905.74666000008,
+     "adSales": 563116.5700000002,
+     "adOrders": 636,
+     "impr": 919669,
+     "clicks": 8252,
+     "totalSales": 988092.0,
+     "totalOrders": 990,
      "channels": [
       "SD",
       "SP"
@@ -432,13 +2022,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0GV4FH6MV",
      "sku": "KD-POLICEBOOK-054",
      "title": "Kidology Beep Montessori Car Book Toy for Toddlers | Interactive Police Car Activity Book with Lights, Music & Sound Effects | Educational Sensory Toy for Babies & Kids",
-     "spend": 17493.239999999998,
-     "adSales": 75357.84,
-     "adOrders": 109,
-     "impr": 307764,
-     "clicks": 2178,
-     "totalSales": 41657.0,
-     "totalOrders": 45,
+     "spend": 21484.090000000004,
+     "adSales": 96092.08000000005,
+     "adOrders": 136,
+     "impr": 370307,
+     "clicks": 2762,
+     "totalSales": 56041.0,
+     "totalOrders": 61,
      "channels": [
       "SB",
       "SP"
@@ -448,13 +2038,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0GVKGB7N1",
      "sku": "KD-ENGWORD-035",
      "title": "Kidology My First English Words Sound Book for Kids | 470+ Words Interactive Talking & Musical Learning Book with 21 Topics, Built-in Quiz, Nursery Rhymes & Piano | Educational Audio Toy Age 3+",
-     "spend": 13746.95,
-     "adSales": 76513.44000000005,
-     "adOrders": 80,
-     "impr": 114110,
-     "clicks": 1390,
-     "totalSales": 187042.44,
-     "totalOrders": 169,
+     "spend": 15253.079999999996,
+     "adSales": 81841.04,
+     "adOrders": 88,
+     "impr": 128659,
+     "clicks": 1538,
+     "totalSales": 230406.09,
+     "totalOrders": 209,
      "channels": [
       "SP"
      ]
@@ -463,13 +2053,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0GVS3DX6R",
      "sku": "KD-NAILMARKER-082",
      "title": "Kidology 12 Colors DIY Nail Art Pens Set – 0.5mm | Ultra Fine Tip Nail Art Marker Pens | Quick Dry Waterproof Nail Polish Pens for DIY Nail Art Kit for Women, Girls & Kids (Beginner Friendly)",
-     "spend": 13043.868149999998,
-     "adSales": 68435.46,
-     "adOrders": 133,
-     "impr": 114976,
-     "clicks": 1613,
-     "totalSales": 78842.0,
-     "totalOrders": 146,
+     "spend": 18358.50815,
+     "adSales": 93231.73000000005,
+     "adOrders": 180,
+     "impr": 135515,
+     "clicks": 2303,
+     "totalSales": 110778.0,
+     "totalOrders": 203,
      "channels": [
       "SD",
       "SP"
@@ -479,14 +2069,15 @@ window.DASHBOARD_DATA = {
      "asin": "B0GN1F7J7G",
      "sku": "KD-NAILMARKER-692",
      "title": "Kidology 12 Colors DIY Nail Art Pens Set | 0.5mm Ultra Fine Nail Art Marker Pens | Quick Dry Waterproof Nail Polish Pens for DIY Nail Painting | Nail Art Kit for Women & Kids",
-     "spend": 41306.36000000001,
-     "adSales": 153078.64,
-     "adOrders": 313,
-     "impr": 548550,
-     "clicks": 7283,
-     "totalSales": 472055.0,
-     "totalOrders": 921,
+     "spend": 45606.70000000001,
+     "adSales": 164956.76000000004,
+     "adOrders": 341,
+     "impr": 710308,
+     "clicks": 8133,
+     "totalSales": 553771.0,
+     "totalOrders": 1105,
      "channels": [
+      "SB",
       "SP"
      ]
     },
@@ -494,13 +2085,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0GW888T9B",
      "sku": "KD-DUCK-YL-004",
      "title": "Kidology Musical Dancing Duck Toy with Lights & Music for Kids| Interactive Walking & Moving Duck Toy | Battery Operated Light & Sound Toy | Activity & Sensory Play Toy | Gift for Boys & Girls",
-     "spend": 14958.38,
+     "spend": 14952.000000000005,
      "adSales": 66364.19,
      "adOrders": 85,
-     "impr": 230352,
-     "clicks": 2500,
-     "totalSales": 55945.0,
-     "totalOrders": 53,
+     "impr": 230805,
+     "clicks": 2499,
+     "totalSales": 60940.0,
+     "totalOrders": 59,
      "channels": [
       "SB",
       "SP"
@@ -510,13 +2101,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0F6NR3VGY",
      "sku": "KD-FRUITTEETHER-P5-331",
      "title": "Kidology Fruit Shaped Teethers for Babies 6+ Months, BPA-Free Silicone Teething Toy for Infants, Natural Organic Freezer Safe & Soft Toys for Toddlers|Ideal Gift for Baby Girls & Boys | Set of 5",
-     "spend": 9753.63,
-     "adSales": 43294.04000000001,
-     "adOrders": 146,
-     "impr": 199318,
-     "clicks": 1441,
-     "totalSales": 54119.0,
-     "totalOrders": 181,
+     "spend": 17339.579999999998,
+     "adSales": 70906.21999999999,
+     "adOrders": 242,
+     "impr": 332522,
+     "clicks": 2485,
+     "totalSales": 92092.0,
+     "totalOrders": 307,
      "channels": [
       "SB",
       "SP"
@@ -526,13 +2117,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0G941M82L",
      "sku": "KD-FAIRYWINGS-087",
      "title": "Kidology Electric Butterfly Wings for Girls 3+ Years | LED Light-Up Moving Magical Fairy Wings with Music | Princess Costume Accessory for Halloween, Christmas & Birthday Parties",
-     "spend": 7090.02,
-     "adSales": 47213.28,
-     "adOrders": 31,
-     "impr": 166994,
-     "clicks": 1451,
-     "totalSales": 55769.0,
-     "totalOrders": 31,
+     "spend": 10474.720000000003,
+     "adSales": 70265.63000000002,
+     "adOrders": 48,
+     "impr": 256680,
+     "clicks": 2078,
+     "totalSales": 80955.0,
+     "totalOrders": 46,
      "channels": [
       "SB",
       "SP"
@@ -542,13 +2133,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0H1H6GJG3",
      "sku": "KD-FLRBBBL-803",
      "title": "Kidology Dancing Sunflower Bubble Machine for Kids & Adults | Rechargeable Electric Bubble Maker with LED Lights | Bubble Gun Toy for Boys & Girls | Birthday Party Gift Toy",
-     "spend": 15621.019999999999,
-     "adSales": 108443.79000000001,
-     "adOrders": 135,
-     "impr": 311097,
-     "clicks": 2933,
-     "totalSales": 129456.0,
-     "totalOrders": 148,
+     "spend": 18185.48,
+     "adSales": 129988.54000000008,
+     "adOrders": 163,
+     "impr": 353832,
+     "clicks": 3412,
+     "totalSales": 172708.0,
+     "totalOrders": 196,
      "channels": [
       "SB",
       "SP"
@@ -558,13 +2149,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0D7SPNLMQ",
      "sku": "KD-FLYINGCAR-BL-45",
      "title": "Kidology 2-in-1 Transforming Car Airplane Toy for Kids | Boosts Cognitive & Sensory Development | LED Lights Music & Projection | 360° Bump & Go Action | Gift for Boys & Girls, Blue",
-     "spend": 21809.140000000007,
-     "adSales": 89245.93999999999,
-     "adOrders": 109,
-     "impr": 523891,
-     "clicks": 3980,
-     "totalSales": 71775.0,
-     "totalOrders": 80,
+     "spend": 28953.299999999992,
+     "adSales": 122554.47999999995,
+     "adOrders": 150,
+     "impr": 707129,
+     "clicks": 5353,
+     "totalSales": 100395.0,
+     "totalOrders": 111,
      "channels": [
       "SB",
       "SP"
@@ -574,13 +2165,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0FYFZQJDD",
      "sku": "KD-MIRRORBOOK-WTH-D1-591",
      "title": "Kidology Baby Mirror Book Toy | Infant Sensory Development with Soft Silicone Teether Tummy Time with High Contrast Black & White Cards ,Flaps & Foldable Design | New Born Gifts for 0–24 Months",
-     "spend": 4905.210000000001,
-     "adSales": 20162.809999999998,
-     "adOrders": 48,
-     "impr": 105914,
-     "clicks": 646,
-     "totalSales": 27445.0,
-     "totalOrders": 59,
+     "spend": 7096.6,
+     "adSales": 27909.480000000014,
+     "adOrders": 66,
+     "impr": 134177,
+     "clicks": 918,
+     "totalSales": 36427.0,
+     "totalOrders": 80,
      "channels": [
       "SP"
      ]
@@ -589,13 +2180,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0DRMDWVRH",
      "sku": "KD-5IN1-METALENGINEER-YL-53-New",
      "title": "Kidology 5-in-1 Construction Robot Toy Set for Boys & Girls| Transforming DIY Assembly Truck & Vehicle Action Figure Play Set | STEM Building & Modular Combination Design | Multicolor",
-     "spend": 8406.289999999999,
-     "adSales": 51526.659999999996,
-     "adOrders": 54,
-     "impr": 349304,
-     "clicks": 2113,
-     "totalSales": 38959.57,
-     "totalOrders": 39,
+     "spend": 11890.579999999996,
+     "adSales": 73830.98,
+     "adOrders": 78,
+     "impr": 542483,
+     "clicks": 2995,
+     "totalSales": 57937.71,
+     "totalOrders": 58,
      "channels": [
       "SP"
      ]
@@ -604,13 +2195,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0DR8GVQ24",
      "sku": "KD-5IN1-METALFIRE-RD-53",
      "title": "Kidology 5-in-1 Fire Rescue Robot Vehicle Set for Boys & Girls | Transforming Fire Truck Action Figure Model | DIY Assembly Playset with Pull-Back Cars & Rotating Parts | Collectible Desk Toy",
-     "spend": 5724.200000000001,
-     "adSales": 41143.68,
-     "adOrders": 44,
-     "impr": 143554,
-     "clicks": 1322,
-     "totalSales": 49950.0,
-     "totalOrders": 53,
+     "spend": 9202.349999999999,
+     "adSales": 54825.52,
+     "adOrders": 61,
+     "impr": 229342,
+     "clicks": 2107,
+     "totalSales": 69930.0,
+     "totalOrders": 74,
      "channels": [
       "SP"
      ]
@@ -619,13 +2210,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0DRVK24MF",
      "sku": "KD-5IN1-DINOSAUR-53",
      "title": "Kidology 5-in-1 Robot Dinosaur Toy Set for Boys & Girls | DIY Transforming Dino Vehicle Assembly Play Set | STEM Building & Action Figure Toy with Modular Combination Design | Multicolor",
-     "spend": 6990.88,
-     "adSales": 21215.019999999997,
-     "adOrders": 24,
-     "impr": 313479,
-     "clicks": 1730,
-     "totalSales": 52946.47,
-     "totalOrders": 53,
+     "spend": 9186.320000000003,
+     "adSales": 30395.879999999986,
+     "adOrders": 34,
+     "impr": 403707,
+     "clicks": 2243,
+     "totalSales": 70928.29,
+     "totalOrders": 71,
      "channels": [
       "SB",
       "SP"
@@ -635,13 +2226,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0DRVLH61R",
      "sku": "KD-5IN1-CONSTRUCTION-YL-53",
      "title": "Kidology 5-in-1 Construction Robot Toy Set for Boys & Girls| Transforming DIY Assembly Truck & Vehicle Action Figure Play Set | STEM Building & Modular Combination Design | Multicolor",
-     "spend": 6656.81,
-     "adSales": 22553.57,
-     "adOrders": 28,
-     "impr": 390263,
-     "clicks": 1782,
-     "totalSales": 23969.0,
-     "totalOrders": 24,
+     "spend": 9847.46,
+     "adSales": 36511.439999999995,
+     "adOrders": 43,
+     "impr": 622199,
+     "clicks": 2645,
+     "totalSales": 32939.4,
+     "totalOrders": 33,
      "channels": [
       "SB",
       "SP"
@@ -651,13 +2242,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0DRVJW2ZB",
      "sku": "KD-5IN1-FIRE-RD-53",
      "title": "Kidology 5-in-1 Fire Rescue Robot Vehicle Set for Boys & Girls | Transforming Fire Truck Action Figure Model | DIY Assembly Playset with Pull-Back Cars & Rotating Parts | Collectible Desk Toy",
-     "spend": 5086.259999999998,
-     "adSales": 26203.66,
-     "adOrders": 28,
-     "impr": 139517,
-     "clicks": 1219,
-     "totalSales": 31968.0,
-     "totalOrders": 33,
+     "spend": 7031.889999999999,
+     "adSales": 38379.840000000004,
+     "adOrders": 40,
+     "impr": 194060,
+     "clicks": 1685,
+     "totalSales": 44955.0,
+     "totalOrders": 46,
      "channels": [
       "SP"
      ]
@@ -666,13 +2257,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0D296NGGK",
      "sku": "KD-BUSYBOARD-DOUBLESIDE-33",
      "title": "Kidology Montessori Busy Board Toy to Develop Basic Skills, Educational Sensory Board Travel Toys for Plane Car Aged 3+ Kids, Activity Parents-Kids Travelling Toys,multicolor",
-     "spend": 120.96,
-     "adSales": 0.0,
-     "adOrders": 0,
-     "impr": 7148,
-     "clicks": 22,
-     "totalSales": 699.0,
-     "totalOrders": 1,
+     "spend": 1831.62,
+     "adSales": 1398.0,
+     "adOrders": 2,
+     "impr": 44248,
+     "clicks": 256,
+     "totalSales": 2097.0,
+     "totalOrders": 3,
      "channels": [
       "SP"
      ]
@@ -680,14 +2271,14 @@ window.DASHBOARD_DATA = {
     {
      "asin": "B0H4B3GMRF",
      "sku": "KD-OCTAGON-S20",
-     "title": "",
-     "spend": 60.46,
-     "adSales": 379.98,
-     "adOrders": 1,
-     "impr": 2979,
-     "clicks": 15,
-     "totalSales": 0.0,
-     "totalOrders": 0,
+     "title": "Kidology Magnetic Chess Game for Kids & Adults | Magnetic Stones Strategy Board Game with Rope Boundary | Family Party Travel Game | Brain Teaser Logic Puzzle | Ideal Gift for Boys & Girls",
+     "spend": 444.06,
+     "adSales": 2469.4900000000002,
+     "adOrders": 8,
+     "impr": 16703,
+     "clicks": 94,
+     "totalSales": 1842.5,
+     "totalOrders": 5,
      "channels": [
       "SP"
      ]
@@ -696,13 +2287,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0FX9G36HP",
      "sku": "KD-SMOKEDRIFTCAR-RD-093",
      "title": "Kidology RC Drift Car with Smoke Effect for Kids & Teens | 1:36 Remote Control Racing Car with LED Lights & Sound | High Speed Drift RC Car for Indoor Outdoor Play (Red)",
-     "spend": 1097.4,
-     "adSales": 1331.42,
-     "adOrders": 2,
-     "impr": 67806,
-     "clicks": 271,
-     "totalSales": 998.99,
-     "totalOrders": 1,
+     "spend": 5427.63,
+     "adSales": 10560.9,
+     "adOrders": 13,
+     "impr": 206101,
+     "clicks": 1194,
+     "totalSales": 13985.86,
+     "totalOrders": 13,
      "channels": [
       "SB",
       "SP"
@@ -712,13 +2303,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0FX9J89K5",
      "sku": "KD-CARRYBAG-BR-071",
      "title": "Kidology Cottage Style Makeup Carry Bag for Kids & Girls | Premium Large Capacity Cosmetic Organizer Pouch | House Shaped Vanity Travel Bag for Makeup, Skincare & Baby Nail Trimmer Storage- Brown",
-     "spend": 346.94000000000005,
-     "adSales": 475.24,
-     "adOrders": 1,
-     "impr": 9806,
-     "clicks": 89,
-     "totalSales": 7984.0,
-     "totalOrders": 16,
+     "spend": 1878.5600000000004,
+     "adSales": 2756.2,
+     "adOrders": 6,
+     "impr": 45822,
+     "clicks": 464,
+     "totalSales": 12974.0,
+     "totalOrders": 25,
      "channels": [
       "SP"
      ]
@@ -727,13 +2318,13 @@ window.DASHBOARD_DATA = {
      "asin": "B0FX9HFVH9",
      "sku": "KD-CARRYBAG-YL-071",
      "title": "Kidology Cartoon Cottage Makeup Bag for Women & Girls | Large Travel Vanity Organizer with Handle | Stylish House Shaped Cosmetic Pouch for Makeup Tools, Baby Nail Trimmer & Beauty Essentials- Yellow",
-     "spend": 91.29000000000002,
-     "adSales": 475.24,
-     "adOrders": 1,
-     "impr": 3341,
-     "clicks": 26,
-     "totalSales": 9980.0,
-     "totalOrders": 20,
+     "spend": 340.77,
+     "adSales": 950.48,
+     "adOrders": 3,
+     "impr": 12802,
+     "clicks": 95,
+     "totalSales": 16966.0,
+     "totalOrders": 35,
      "channels": [
       "SP"
      ]
@@ -742,16 +2333,1084 @@ window.DASHBOARD_DATA = {
      "asin": "B0FX9G7PR5",
      "sku": "KD-CARRYBAG-BU-071",
      "title": "Kidology Cartoon Style Carry Makeup Bag for Women & Girls | Large Capacity Travel Cosmetic Organizer Pouch | Cute House Shaped Vanity Bag | Ideal for Storing Makeup Tool - Blue",
-     "spend": 572.35,
-     "adSales": 2756.1800000000003,
-     "adOrders": 5,
-     "impr": 14986,
-     "clicks": 139,
-     "totalSales": 7485.0,
-     "totalOrders": 14,
+     "spend": 2954.8399999999992,
+     "adSales": 7033.34,
+     "adOrders": 13,
+     "impr": 80621,
+     "clicks": 686,
+     "totalSales": 18962.0,
+     "totalOrders": 35,
      "channels": [
       "SP"
      ]
+    }
+   ],
+   "campaigns": [
+    {
+     "name": "KD_ Magnetic Tiles (Manual- Broad Phrase) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 25601.97,
+     "sales": 244194.78,
+     "orders": 261,
+     "impr": 151473,
+     "clicks": 2673
+    },
+    {
+     "name": "KD_ Magnetic Tiles (Manual- Exact) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 19758.66,
+     "sales": 105493.9,
+     "orders": 123,
+     "impr": 458668,
+     "clicks": 2005
+    },
+    {
+     "name": "KD_ Magnetic Tiles (Manual- PT) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 17891.86,
+     "sales": 124746.87,
+     "orders": 146,
+     "impr": 79260,
+     "clicks": 1688
+    },
+    {
+     "name": "HC_ 5in1 Robot (Auto)",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SP"
+     ],
+     "spend": 16966.18,
+     "sales": 81399.77,
+     "orders": 89,
+     "impr": 651160,
+     "clicks": 4196
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) High Rev B0GN1F7J7G",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 15089.72,
+     "sales": 75750.78,
+     "orders": 152,
+     "impr": 162527,
+     "clicks": 2564
+    },
+    {
+     "name": "English Word Book Manual  B0GVKGB7N1",
+     "asin": "B0GVKGB7N1",
+     "product": "English Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 14650.98,
+     "sales": 75751.54,
+     "orders": 82,
+     "impr": 116043,
+     "clicks": 1411
+    },
+    {
+     "name": "HC_ 5in1 Robot (Manual- P/B)",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SP"
+     ],
+     "spend": 14259.59,
+     "sales": 95763.41,
+     "orders": 106,
+     "impr": 384588,
+     "clicks": 3251
+    },
+    {
+     "name": "KD_ Lizard (Manual- PT) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 14056.45,
+     "sales": 81292.75,
+     "orders": 76,
+     "impr": 84902,
+     "clicks": 1967
+    },
+    {
+     "name": "KD_ Magnetic Tiles (Auto) B0GW375CMP",
+     "asin": "B0GW375CMP",
+     "product": "Magnetic Tiles",
+     "channels": [
+      "SP"
+     ],
+     "spend": 13374.1,
+     "sales": 88681.02,
+     "orders": 106,
+     "impr": 226209,
+     "clicks": 1853
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Auto- High rev) B0GN1F7J7G 2.0",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 10768.93,
+     "sales": 23476.25,
+     "orders": 51,
+     "impr": 330126,
+     "clicks": 1839
+    },
+    {
+     "name": "HC_ Flying Car (Manual- Exact/Phrase/Broad) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 10424.98,
+     "sales": 49047.03,
+     "orders": 58,
+     "impr": 323810,
+     "clicks": 1645
+    },
+    {
+     "name": "KD_ Lizard (Manual- Exact) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 9534.48,
+     "sales": 61879.95,
+     "orders": 47,
+     "impr": 86620,
+     "clicks": 1194
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) HIGH (low) Rev B0GN1F7J7G",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 8905.19,
+     "sales": 38493.45,
+     "orders": 82,
+     "impr": 56393,
+     "clicks": 1498
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Auto- Low rev) B0GVS3DX6R",
+     "asin": "B0GVS3DX6R",
+     "product": "Nail Art (Low Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 8584.76,
+     "sales": 33267.72,
+     "orders": 64,
+     "impr": 27031,
+     "clicks": 1123
+    },
+    {
+     "name": "KD_Sunflower (Auto) B0H1H6GJG3",
+     "asin": "B0H1H6GJG3",
+     "product": "Sunflower Bubble",
+     "channels": [
+      "SP"
+     ],
+     "spend": 8420.24,
+     "sales": 70299.97,
+     "orders": 84,
+     "impr": 143738,
+     "clicks": 1316
+    },
+    {
+     "name": "HC_ Flying Car (Video) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SB"
+     ],
+     "spend": 8220.57,
+     "sales": 22479.98,
+     "orders": 29,
+     "impr": 120060,
+     "clicks": 1811
+    },
+    {
+     "name": "KD_ Police Book (Auto) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 7735.96,
+     "sales": 38252.76,
+     "orders": 49,
+     "impr": 199181,
+     "clicks": 916
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- PT- High Rev) B0GN1F7J7G",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 6855.88,
+     "sales": 15544.82,
+     "orders": 33,
+     "impr": 20758,
+     "clicks": 1167
+    },
+    {
+     "name": "HC_ 5in1 Robot Yellow (video) B0DRVLH61R",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SB"
+     ],
+     "spend": 6742.82,
+     "sales": 18418.62,
+     "orders": 19,
+     "impr": 515873,
+     "clicks": 1893
+    },
+    {
+     "name": "KD_ Lizard (Manual- Broad/Phrase) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 6125.82,
+     "sales": 37426.66,
+     "orders": 33,
+     "impr": 48029,
+     "clicks": 872
+    },
+    {
+     "name": "KD_ Lizard (Auto) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 5998.87,
+     "sales": 35998.52,
+     "orders": 32,
+     "impr": 93875,
+     "clicks": 1330
+    },
+    {
+     "name": "HC_ Flying Car (PT) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 5909.56,
+     "sales": 21512.31,
+     "orders": 28,
+     "impr": 106392,
+     "clicks": 979
+    },
+    {
+     "name": "HC_Dancing Duck (Auto) B0GW888T9B",
+     "asin": "B0GW888T9B",
+     "product": "Dancing Duck",
+     "channels": [
+      "SP"
+     ],
+     "spend": 5453.98,
+     "sales": 27440.46,
+     "orders": 35,
+     "impr": 96250,
+     "clicks": 743
+    },
+    {
+     "name": "KD_ Sassy Stacker (Manual- E/P/B) B0FX48DHCN | B0GC5DK8CW",
+     "asin": "B0GC5DK8CW",
+     "product": "Baby Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 5212.02,
+     "sales": 15433.13,
+     "orders": 33,
+     "impr": 53037,
+     "clicks": 426
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) Low Rev B0GVS3DX6R",
+     "asin": "B0GVS3DX6R",
+     "product": "Nail Art (Low Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 4954.08,
+     "sales": 39634.43,
+     "orders": 79,
+     "impr": 22381,
+     "clicks": 585
+    },
+    {
+     "name": "KD_Sunflower (Video) B0H1H6GJG3",
+     "asin": "B0H1H6GJG3",
+     "product": "Sunflower Bubble",
+     "channels": [
+      "SB"
+     ],
+     "spend": 4848.45,
+     "sales": 16493.34,
+     "orders": 22,
+     "impr": 114383,
+     "clicks": 1269
+    },
+    {
+     "name": "HC_ 5in1 Dino Robot (video) B0DRVK24MF",
+     "asin": "B0DRVK24MF",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SB"
+     ],
+     "spend": 4730.74,
+     "sales": 8942.76,
+     "orders": 10,
+     "impr": 253622,
+     "clicks": 1153
+    },
+    {
+     "name": "HC_Fruit shape Teether (Video) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SB"
+     ],
+     "spend": 4656.63,
+     "sales": 18507.52,
+     "orders": 62,
+     "impr": 114323,
+     "clicks": 779
+    },
+    {
+     "name": "Naveen-Duck-KT(Storio Amazon PI KWD) B0GW888T9B",
+     "asin": "B0GW888T9B",
+     "product": "Dancing Duck",
+     "channels": [
+      "SP"
+     ],
+     "spend": 4597.65,
+     "sales": 17294.78,
+     "orders": 22,
+     "impr": 83761,
+     "clicks": 619
+    },
+    {
+     "name": "HC_Cosmetic Nail Art (Manual- Exact) Low rev B0GVS3DX6R",
+     "asin": "B0GVS3DX6R",
+     "product": "Nail Art (Low Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 4540.05,
+     "sales": 20054.34,
+     "orders": 36,
+     "impr": 77510,
+     "clicks": 571
+    },
+    {
+     "name": "HC_Fruit shape Teether (Manual-Phrase) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 4426.49,
+     "sales": 17265.6,
+     "orders": 61,
+     "impr": 73000,
+     "clicks": 569
+    },
+    {
+     "name": "HC_ 5in1 Robot (Manual- E)",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SP"
+     ],
+     "spend": 4317.38,
+     "sales": 27516.24,
+     "orders": 30,
+     "impr": 175272,
+     "clicks": 1118
+    },
+    {
+     "name": "KD_Sunflower (Manual- Braod/Phrase) B0H1H6GJG3",
+     "asin": "B0H1H6GJG3",
+     "product": "Sunflower Bubble",
+     "channels": [
+      "SP"
+     ],
+     "spend": 4268.99,
+     "sales": 39963.8,
+     "orders": 51,
+     "impr": 85170,
+     "clicks": 733
+    },
+    {
+     "name": "SB_HC_Dancing Duck (Video) B0GW888T9B",
+     "asin": "B0GW888T9B",
+     "product": "Dancing Duck",
+     "channels": [
+      "SB"
+     ],
+     "spend": 4107.51,
+     "sales": 19868.95,
+     "orders": 26,
+     "impr": 41605,
+     "clicks": 1004
+    },
+    {
+     "name": "KD_ Baby Carry Bag (AUTO) B0FX9J89K5  | B0FX9HFVH9  | B0FX9G7PR5",
+     "asin": "B0FX9J89K5",
+     "product": "Baby Carry Bag",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3875.39,
+     "sales": 9789.54,
+     "orders": 20,
+     "impr": 91338,
+     "clicks": 978
+    },
+    {
+     "name": "Fairy Wings Manual B0G941M82L",
+     "asin": "B0G941M82L",
+     "product": "Fairy Wings",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3652.32,
+     "sales": 26793.31,
+     "orders": 17,
+     "impr": 81738,
+     "clicks": 666
+    },
+    {
+     "name": "Fairy Wings PT B0G941M82L",
+     "asin": "B0G941M82L",
+     "product": "Fairy Wings",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3526.51,
+     "sales": 25560.91,
+     "orders": 17,
+     "impr": 52432,
+     "clicks": 558
+    },
+    {
+     "name": "KD_ Police Book (Manual- PT) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3438.93,
+     "sales": 23017.64,
+     "orders": 32,
+     "impr": 28398,
+     "clicks": 425
+    },
+    {
+     "name": "HC_ Cosmetic Nail Art (Auto- High rev)",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3433.61,
+     "sales": 9980.98,
+     "orders": 20,
+     "impr": 118375,
+     "clicks": 901
+    },
+    {
+     "name": "KD_ Police Book (Video) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SB"
+     ],
+     "spend": 3142.29,
+     "sales": 11274.19,
+     "orders": 18,
+     "impr": 21427,
+     "clicks": 420
+    },
+    {
+     "name": "KD_ Police Book (Manual- Broad/Phrase) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 3077.92,
+     "sales": 7939.94,
+     "orders": 14,
+     "impr": 45109,
+     "clicks": 295
+    },
+    {
+     "name": "KD_ Mirror Book (PT) B0FYFZQJDD",
+     "asin": "B0FYFZQJDD",
+     "product": "Mirror Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2958.36,
+     "sales": 16918.11,
+     "orders": 40,
+     "impr": 20210,
+     "clicks": 376
+    },
+    {
+     "name": "Nail Trimmer new manual",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2853.35,
+     "sales": 15551.39,
+     "orders": 21,
+     "impr": 30427,
+     "clicks": 508
+    },
+    {
+     "name": "HC_ Flying Car (AUTO) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2815.18,
+     "sales": 21025.67,
+     "orders": 24,
+     "impr": 99577,
+     "clicks": 641
+    },
+    {
+     "name": "HC_Fruit shape Teether (Manual-PT) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2747.57,
+     "sales": 11959.92,
+     "orders": 42,
+     "impr": 34614,
+     "clicks": 323
+    },
+    {
+     "name": "HC_Fruit shape Teether (Manual-Broad) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2740.95,
+     "sales": 13327.52,
+     "orders": 46,
+     "impr": 51802,
+     "clicks": 416
+    },
+    {
+     "name": "KD_ Lizard (Bid Down_Manual- Broad/Phrase) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2592.12,
+     "sales": 7039.02,
+     "orders": 5,
+     "impr": 47563,
+     "clicks": 551
+    },
+    {
+     "name": "KD_ Mirror Book (Manual- Phrase/Broad) B0FYFZQJDD",
+     "asin": "B0FYFZQJDD",
+     "product": "Mirror Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2420.22,
+     "sales": 3655.25,
+     "orders": 8,
+     "impr": 87902,
+     "clicks": 292
+    },
+    {
+     "name": "HC_Fruit shape Teether (Auto) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2349.56,
+     "sales": 7926.62,
+     "orders": 26,
+     "impr": 43277,
+     "clicks": 307
+    },
+    {
+     "name": "KD_ Police Book (Manual- Broad/Phrase/Exact) 2.0 B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 2286.97,
+     "sales": 12716.13,
+     "orders": 18,
+     "impr": 44710,
+     "clicks": 345
+    },
+    {
+     "name": "KD_ Smoke Drift Car (Auto) B0FX9G36HP",
+     "asin": "B0FX9G36HP",
+     "product": "Smoke Drift Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1920.51,
+     "sales": 3900.94,
+     "orders": 4,
+     "impr": 65627,
+     "clicks": 446
+    },
+    {
+     "name": "KD_ Smoke Drift Car (Manual- Broad) B0FX9G36HP",
+     "asin": "B0FX9G36HP",
+     "product": "Smoke Drift Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1802.04,
+     "sales": 951.42,
+     "orders": 2,
+     "impr": 72750,
+     "clicks": 396
+    },
+    {
+     "name": "Fairy Wings Auto B0G941M82L",
+     "asin": "B0G941M82L",
+     "product": "Fairy Wings",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1777.16,
+     "sales": 9631.42,
+     "orders": 8,
+     "impr": 92538,
+     "clicks": 449
+    },
+    {
+     "name": "KD_ Sassy Stacker (AUTO) B0FX48DHCN | B0GC5DK8CW",
+     "asin": "B0GC5DK8CW",
+     "product": "Baby Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1751.13,
+     "sales": 5218.03,
+     "orders": 11,
+     "impr": 51660,
+     "clicks": 233
+    },
+    {
+     "name": "KD_ Smoke Drift Car (Manual- Phrase) B0FX9G36HP",
+     "asin": "B0FX9G36HP",
+     "product": "Smoke Drift Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1705.08,
+     "sales": 5708.54,
+     "orders": 7,
+     "impr": 67631,
+     "clicks": 352
+    },
+    {
+     "name": "Clearance Montessori Busy Board Toy",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1691.75,
+     "sales": 7247.33,
+     "orders": 12,
+     "impr": 27672,
+     "clicks": 320
+    },
+    {
+     "name": "Police Book new Video B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SB"
+     ],
+     "spend": 1687.11,
+     "sales": 2511.42,
+     "orders": 4,
+     "impr": 30970,
+     "clicks": 352
+    },
+    {
+     "name": "KD_ mirror book (Auto) B0FYFZQJDD",
+     "asin": "B0FYFZQJDD",
+     "product": "Mirror Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1620.21,
+     "sales": 6530.43,
+     "orders": 16,
+     "impr": 24810,
+     "clicks": 236
+    },
+    {
+     "name": "HC_ Flying Car (Manual- Exact) B0D7SPNLMQ",
+     "asin": "B0D7SPNLMQ",
+     "product": "Flying Car",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1574.45,
+     "sales": 8489.49,
+     "orders": 11,
+     "impr": 56500,
+     "clicks": 273
+    },
+    {
+     "name": "Sassy stacker  L2 B0FX48DHCN",
+     "asin": "B0FX48DHCN",
+     "product": "Sassy Stacker",
+     "channels": [
+      "SB"
+     ],
+     "spend": 1558.96,
+     "sales": 4181.83,
+     "orders": 9,
+     "impr": 37134,
+     "clicks": 233
+    },
+    {
+     "name": "Fairy Wings Video B0G941M82L",
+     "asin": "B0G941M82L",
+     "product": "Fairy Wings",
+     "channels": [
+      "SB"
+     ],
+     "spend": 1518.73,
+     "sales": 8279.99,
+     "orders": 6,
+     "impr": 29912,
+     "clicks": 405
+    },
+    {
+     "name": "Robot Police Car",
+     "asin": "B0DRVLH61R",
+     "product": "5-in-1 Robot",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1477.65,
+     "sales": 7604.79,
+     "orders": 9,
+     "impr": 16719,
+     "clicks": 259
+    },
+    {
+     "name": "KD_ Baby Carry Bag (Manual) B0FX9J89K5  | B0FX9HFVH9  | B0FX9G7PR5",
+     "asin": "B0FX9J89K5",
+     "product": "Baby Carry Bag",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1298.78,
+     "sales": 950.48,
+     "orders": 2,
+     "impr": 47907,
+     "clicks": 267
+    },
+    {
+     "name": "KD_ Sassy Stacker (PT) B0FX48DHCN | B0GC5DK8CW",
+     "asin": "B0GC5DK8CW",
+     "product": "Baby Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1293.74,
+     "sales": 6839.96,
+     "orders": 14,
+     "impr": 25722,
+     "clicks": 137
+    },
+    {
+     "name": "KD_ Busy Board (AUTO) B0D296NGGK",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1227.22,
+     "sales": 1398.0,
+     "orders": 2,
+     "impr": 22882,
+     "clicks": 177
+    },
+    {
+     "name": "KD_ Lizard (Fixed Bid_Manual- Broad/Phrase) B0GVK9LF4D",
+     "asin": "B0GVK9LF4D",
+     "product": "Lizard",
+     "channels": [
+      "SP"
+     ],
+     "spend": 1195.86,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 26287,
+     "clicks": 327
+    },
+    {
+     "name": "HC_Dancing Duck (Manual- PT) B0GW888T9B",
+     "asin": "B0GW888T9B",
+     "product": "Dancing Duck",
+     "channels": [
+      "SP"
+     ],
+     "spend": 787.36,
+     "sales": 1760.0,
+     "orders": 2,
+     "impr": 8611,
+     "clicks": 131
+    },
+    {
+     "name": "Nail Trimmer new PT",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 540.75,
+     "sales": 3328.56,
+     "orders": 5,
+     "impr": 7313,
+     "clicks": 133
+    },
+    {
+     "name": "KD_Sunflower (PT) B0H1H6GJG3",
+     "asin": "B0H1H6GJG3",
+     "product": "Sunflower Bubble",
+     "channels": [
+      "SP"
+     ],
+     "spend": 540.32,
+     "sales": 2900.0,
+     "orders": 5,
+     "impr": 8297,
+     "clicks": 75
+    },
+    {
+     "name": "HC_ Cosmetic Nail Marker (VIDEO- High Rev) B0GN1F7J7G",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SB"
+     ],
+     "spend": 538.52,
+     "sales": 1710.48,
+     "orders": 3,
+     "impr": 21355,
+     "clicks": 159
+    },
+    {
+     "name": "KD_ Busy Board (Manual- P) B0D296NGGK",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 348.36,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 16102,
+     "clicks": 47
+    },
+    {
+     "name": "Naveen-SB-Sassy Stacker-B0FX48DHCN-Video",
+     "asin": "B0FX48DHCN",
+     "product": "Sassy Stacker",
+     "channels": [
+      "SB"
+     ],
+     "spend": 262.42,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 4218,
+     "clicks": 39
+    },
+    {
+     "name": "KD_ Magnetic Stone (AUTO) B0H4B3GMRF",
+     "asin": "B0H4B3GMRF",
+     "product": "Magnetic Stone",
+     "channels": [
+      "SP"
+     ],
+     "spend": 260.65,
+     "sales": 1852.36,
+     "orders": 6,
+     "impr": 9843,
+     "clicks": 54
+    },
+    {
+     "name": "KD_ Busy Board (Manual- B) B0D296NGGK",
+     "asin": "B0D296NGGK",
+     "product": "Busy Board",
+     "channels": [
+      "SP"
+     ],
+     "spend": 256.04,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 5262,
+     "clicks": 32
+    },
+    {
+     "name": "Baby nail kit Jan manual",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 225.33,
+     "sales": 831.0,
+     "orders": 3,
+     "impr": 1847,
+     "clicks": 21
+    },
+    {
+     "name": "Sassy Stacker PT",
+     "asin": "B0FX48DHCN",
+     "product": "Sassy Stacker",
+     "channels": [
+      "SP"
+     ],
+     "spend": 156.29,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 8278,
+     "clicks": 22
+    },
+    {
+     "name": "KD_ Magnetic Stone (Manual- B) B0H4B3GMRF",
+     "asin": "B0H4B3GMRF",
+     "product": "Magnetic Stone",
+     "channels": [
+      "SP"
+     ],
+     "spend": 115.07,
+     "sales": 617.13,
+     "orders": 2,
+     "impr": 3124,
+     "clicks": 24
+    },
+    {
+     "name": "KD_ Police Book (Manual- Exact) B0GV4FH6MV",
+     "asin": "B0GV4FH6MV",
+     "product": "Police Book",
+     "channels": [
+      "SP"
+     ],
+     "spend": 114.91,
+     "sales": 380.0,
+     "orders": 1,
+     "impr": 486,
+     "clicks": 9
+    },
+    {
+     "name": "KD_Sunflower (Manual- Exact) B0H1H6GJG3",
+     "asin": "B0H1H6GJG3",
+     "product": "Sunflower Bubble",
+     "channels": [
+      "SP"
+     ],
+     "spend": 107.48,
+     "sales": 331.43,
+     "orders": 1,
+     "impr": 2244,
+     "clicks": 19
+    },
+    {
+     "name": "SP_KT_NAIL TRIMMER RK",
+     "asin": "B0GN1F7J7G",
+     "product": "Nail Art (High Rev)",
+     "channels": [
+      "SP"
+     ],
+     "spend": 74.5,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 2136,
+     "clicks": 9
+    },
+    {
+     "name": "HC_Fruit shape Teether (Manual-Exact) B0F6NR3VGY",
+     "asin": "B0F6NR3VGY",
+     "product": "Fruit Teether",
+     "channels": [
+      "SP"
+     ],
+     "spend": 72.63,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 1935,
+     "clicks": 11
+    },
+    {
+     "name": "KD_ Magnetic Stone (Manual- P) B0H4B3GMRF",
+     "asin": "B0H4B3GMRF",
+     "product": "Magnetic Stone",
+     "channels": [
+      "SP"
+     ],
+     "spend": 68.34,
+     "sales": 0.0,
+     "orders": 0,
+     "impr": 3730,
+     "clicks": 16
     }
    ]
   }
@@ -761,7 +3420,7 @@ window.DASHBOARD_DATA = {
 </script>
 <script>
 const D = window.DASHBOARD_DATA;
-const PALETTE = ['#6c4ce0','#14b8a6','#ff6b6b','#f59e0b','#3b82f6','#22c55e','#ec4899','#0ea5e9','#8b5cf6','#f97316'];
+const PALETTE = ['#2563eb','#0e8f86','#4b57a8','#c98a2b','#1f7fb6','#1f9d57','#8a4f9e','#d4564b','#475569','#0ea5b7'];
 const TARGET_ACOS = 25; // % threshold line
 const LS_KEY = 'kidology_history_v1';
 
@@ -787,6 +3446,39 @@ const TARGET = {
  "B0FX9G7PR5":"KD-CARRYBAG-BU-071"
 };
 const TARGET_ORDER = Object.keys(TARGET);
+
+// Campaign -> product mapping (from Amitoje's plan). Live metrics overlay when daily files are uploaded.
+const CAMPAIGN_GROUPS = [
+ {p:'Mirror Book', a:['B0FYFZQJDD'], c:['KD_ Mirror Book (PT)','KD_ Mirror Book (Auto)','KD_ Mirror Book (Manual- Phrase/Broad)'], pend:'Exact & Video'},
+ {p:'Sunflower Bubble', a:['B0H1H6GJG3'], c:['KD_Sunflower (Manual- Exact)','KD_Sunflower (Video)','KD_Sunflower (Manual- Broad/Phrase)','KD_Sunflower (Auto)','KD_Sunflower (PT)']},
+ {p:'Fairy Wings', a:['B0G941M82L'], c:['Fairy Wings PT','Fairy Wings Video','Fairy Wings Manual','Fairy Wings Auto']},
+ {p:'Magnetic Tiles', a:['B0GW375CMP'], c:['KD_ Magnetic Tiles (Manual- Broad/Phrase)','KD_ Magnetic Tiles (Manual- PT)','KD_ Magnetic Tiles (Manual- Exact)','KD_ Magnetic Tiles (Auto)']},
+ {p:'Lizard', a:['B0GVK9LF4D'], c:['KD_ Lizard (Bid Down_Manual- Broad/Phrase)','KD_ Lizard (Fixed Bid_Manual- Broad/Phrase)','KD_ Lizard (Manual- PT)','KD_ Lizard (Manual- Exact)','KD_ Lizard (Manual- Broad/Phrase)','KD_ Lizard (Auto)','KD_ Lizard (Video)']},
+ {p:'English Book', a:['B0GVKGB7N1'], c:['English Word Book Manual','KD_ English Sound Book (Meta KWD)','Naveen-SB-English Word Book-Video','KD_ English Sound Book (Auto)'], pend:'Exact'},
+ {p:'Police Book', a:['B0GV4FH6MV'], c:['Police Book new Video','KD_ Police Book (Manual- Broad/Phrase/Exact) 2.0','KD_ Police Book (Manual- Exact)','KD_ Police Book (Manual- PT)','KD_ Police Book (Video)','KD_ Police Book (Manual- Broad/Phrase)','KD_ Police Book (Auto)']},
+ {p:'Dancing Duck', a:['B0GW888T9B'], c:['SB_HC_Dancing Duck (Video)','HC_Dancing Duck (Auto)','Naveen-Duck-KT (Storio Amazon PI KWD)','HC_Dancing Duck (Manual- Exact)','HC_Dancing Duck (Manual- PT)']},
+ {p:'Sassy Stacker', a:['B0FX48DHCN','B0GC5DK8CW'], c:['KD_ Sassy Stacker (PT)','KD_ Sassy Stacker (AUTO)','Sassy stacker L2','KD_ Sassy Stacker (Manual- E/P/B)'], pend:'Exact'},
+ {p:'Busy Board', a:['B0D296NGGK'], c:['KD_ Busy Board (AUTO)','KD_ Busy Board (Manual- B)','KD_ Busy Board (Manual- P)'], pend:'Exact, Video & PT'},
+ {p:'Baby Carry Bag', a:['B0FX9J89K5','B0FX9HFVH9','B0FX9G7PR5'], c:['KD_ Baby Carry Bag (Manual)','KD_ Baby Carry Bag (AUTO)']},
+ {p:'Magnetic Stone', a:['B0H4B3GMRF'], c:['KD_ Magnetic Stone (AUTO)','KD_ Magnetic Stone (Manual- B)','KD_ Magnetic Stone (Manual- P)']},
+ {p:'Smoke Drift Car', a:['B0FX9G36HP'], c:['KD_ Smoke Drift Car (Auto)','KD_ Smoke Drift Car (Manual- Broad)','KD_ Smoke Drift Car (Manual- Phrase)','KD_ Smoke Drift Car (Manual- PT)']},
+ {p:'Flying Car', a:['B0D7SPNLMQ'], c:['HC_ Flying Car (Video)','HC_ Flying Car (AUTO)','HC_ Flying Car (Manual- Exact/Phrase/Broad)','HC_ Flying Car (PT)','HC_ Flying Car (Manual- Exact)']},
+ {p:'Fruit Teether', a:['B0F6NR3VGY'], c:['HC_Fruit shape Teether (Auto)','HC_Fruit shape Teether (Video)','HC_Fruit shape Teether (Manual-PT)','HC_Fruit shape Teether (Manual-Phrase)','HC_Fruit shape Teether (Manual-Broad)','HC_Fruit shape Teether (Manual-Exact)']},
+ {p:'Nail Art (Low Rev)', a:['B0GVS3DX6R'], c:['HC_ Cosmetic Nail Art (Auto- Low rev)','HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) Low Rev','HC_Cosmetic Nail Art (Manual- Exact) Low rev','HC_ Cosmetic Nail Art (Manual- PT- Low Rev)']},
+ {p:'Nail Art (High Rev)', a:['B0GN1F7J7G'], c:['HC_ Cosmetic Nail Art (Manual- PT- High Rev)','HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) HIGH','HC_ Cosmetic Nail Art (Auto- High rev) 2.0','HC_ Cosmetic Nail Art (Manual- Broad/Phrase/Exact) High Rev','HC_ Cosmetic Nail Marker (VIDEO- High Rev)','HC_ Cosmetic Nail Art (Manual- Exact) High Rev']},
+ {p:'5-in-1 Robot', a:['B0DRVLH61R','B0DRVK24MF','B0DRVJW2ZB','B0DRMDWVRH','B0DR8GVQ24'], c:['HC_ 5in1 Robot Yellow (video)','HC_ 5in1 Dino Robot (video)','HC_ 5in1 Robot (Manual- P/B)','HC_ 5in1 Robot (Auto)','HC_ 5in1 Robot (Manual- E)','HC_ 5in1 Robot (Self PT)','HC_ 5in1 Robot (Manual- PT) All 5']},
+ {p:'Generic / Competitor', a:[], c:['KD_ Low SP (Manual- Generic KWD) — 11 prod','KD_ High SP (Manual- Generic KWD) — 13 prod','SD Best Seller Self Targeting','SD competitor-targeting (Football, Car Race, Felt Board, Construction)']},
+];
+function campType(n){
+  const s=n.toLowerCase();
+  if(s.includes('video')) return 'Video';
+  if(/\bpt\b|self pt|product target/.test(s)) return 'PT';
+  if(s.includes('auto')) return 'Auto';
+  if(s.includes('exact')) return 'Exact';
+  if(s.startsWith('sb_')||s.includes(' sb ')||s.startsWith('sb-')) return 'SB';
+  if(s.includes('manual')) return 'Manual';
+  return 'KWD';
+}
 
 // ---------- formatting ----------
 const inr = new Intl.NumberFormat('en-IN',{maximumFractionDigits:0});
@@ -834,10 +3526,47 @@ function reasons(o){
 }
 
 // ---------- state ----------
+// ---------- portfolio (add / remove ASINs) ----------
+const PF_KEY='kidology_portfolio_v1';
+function getPortfolio(){ try{return JSON.parse(localStorage.getItem(PF_KEY))||{added:[],hidden:[]};}catch(e){return{added:[],hidden:[]};} }
+function savePortfolio(p){ localStorage.setItem(PF_KEY,JSON.stringify(p)); }
+function applyPortfolio(list){
+  const pf=getPortfolio(), hidden=new Set(pf.hidden||[]);
+  let out=list.filter(p=>!hidden.has(p.asin));
+  const have=new Set(out.map(p=>p.asin));
+  (pf.added||[]).forEach(a=>{ if(!have.has(a.asin)) out.push(enrich(
+    {asin:a.asin,sku:a.sku||a.asin,title:a.name||'',spend:0,adSales:0,adOrders:0,impr:0,clicks:0,totalSales:0,totalOrders:0,channels:[]})); });
+  return out;
+}
+function reloadCurrent(){
+  if(MODE==='range'){ loadRange(document.getElementById('rangeStart').value,document.getElementById('rangeEnd').value); return; }
+  const sel=document.getElementById('periodSel'); if(sel && sel.value) loadPeriod(sel.value);
+}
+function addProduct(){
+  let asin=(prompt('New product ASIN (e.g. B0ABC12345):')||'').trim().toUpperCase(); if(!asin) return;
+  if(!/^B0[A-Z0-9]{8}$/.test(asin) && !confirm('"'+asin+'" doesn\'t look like a standard ASIN. Add anyway?')) return;
+  const sku=((prompt('Short name / SKU for '+asin+':')||asin).trim())||asin;
+  const pf=getPortfolio(); pf.hidden=(pf.hidden||[]).filter(h=>h!==asin);
+  pf.added=pf.added||[]; if(!pf.added.some(a=>a.asin===asin)) pf.added.push({asin,sku});
+  savePortfolio(pf);
+  if(!TARGET[asin]){ TARGET[asin]=sku; TARGET_ORDER.push(asin); }   // capture in future uploads too
+  reloadCurrent();
+}
+function deleteProduct(asin){
+  const p=(CUR||[]).find(x=>x.asin===asin);
+  if(!confirm('Remove "'+(p?p.sku.replace(/^KD-/,''):asin)+'" from the dashboard?\n(You can re-add it any time.)')) return;
+  const pf=getPortfolio();
+  pf.added=(pf.added||[]).filter(a=>a.asin!==asin);
+  if(!(pf.hidden||[]).includes(asin)) (pf.hidden=pf.hidden||[]).push(asin);
+  savePortfolio(pf); reloadCurrent();
+}
+
 let CUR; // current enriched product list
+let CUR_CAMPS = []; // current entry's campaign-level metrics (if uploaded)
 function loadPeriod(id){
   const h = D.history.find(e=>e.id===id) || D.history[D.history.length-1];
-  CUR = h.products.map(enrich);
+  CUR = applyPortfolio(h.products.map(enrich));
+  CUR_CAMPS = h.campaigns || [];
   document.getElementById('provNote').style.display = (h===D.history[D.history.length-1] && h.kind!=='final')?'inline-block':'none';
   renderAll();
 }
@@ -859,7 +3588,7 @@ function renderKPIs(){
     ['c-ord','📦','Products',String(CUR.length),'active ASINs'],
   ];
   document.getElementById('kpis').innerHTML = cards.map(c=>`
-    <div class="kpi ${c[0]}"><div class="lab"><span class="ic">${c[1]}</span>${c[2]}</div>
+    <div class="kpi ${c[0]}"><div class="lab"><span class="ic"></span>${c[2]}</div>
     <div class="val">${c[3]}</div><div class="sub">${c[4]}</div></div>`).join('');
 }
 
@@ -875,8 +3604,8 @@ function renderCharts(){
   const labels=top.map(p=>p.sku.replace(/^KD-/,''));
   dead('ss');
   charts.ss=new Chart(chSpendSales,{type:'bar',data:{labels,datasets:[
-    {label:'Spend',data:top.map(p=>p.spend),backgroundColor:'#ff6b6b',borderRadius:5},
-    {label:'Ad Sales',data:top.map(p=>p.adSales),backgroundColor:'#14b8a6',borderRadius:5}]},
+    {label:'Spend',data:top.map(p=>p.spend),backgroundColor:'#d4564b',borderRadius:4},
+    {label:'Ad Sales',data:top.map(p=>p.adSales),backgroundColor:'#0e8f86',borderRadius:4}]},
     options:{indexAxis:'y',maintainAspectRatio:false,scales:{x:{ticks:{callback:v=>money(v)}}},
       plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+money(c.raw)}}}}});
 
@@ -901,14 +3630,14 @@ function renderCharts(){
   charts.ac=new Chart(chAcos,{type:'bar',plugins:[targetLine],
     data:{labels:byAcos.map(p=>p.sku.replace(/^KD-/,'')),
     datasets:[{label:'ACOS %',data:byAcos.map(p=>+p.acos.toFixed(1)),
-      backgroundColor:byAcos.map(p=>p.acos>35?'#dc2626':p.acos>=25?'#f59e0b':'#22c55e'),borderRadius:5}]},
+      backgroundColor:byAcos.map(p=>p.acos>35?'#b91c1c':p.acos>=25?'#c98a2b':'#1f9d57'),borderRadius:4}]},
     options:{maintainAspectRatio:false,scales:{y:{ticks:{callback:v=>v+'%'}}},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'ACOS '+pct(c.raw)}}}}});
 
   dead('ao');
   const ad=sum('adSales'), org=CUR.reduce((a,p)=>a+p.organic,0);
   charts.ao=new Chart(chAdOrg,{type:'doughnut',data:{labels:['Ad-driven','Organic'],
-    datasets:[{data:[ad,org],backgroundColor:['#6c4ce0','#22c55e'],borderWidth:2,borderColor:'#fff'}]},
+    datasets:[{data:[ad,org],backgroundColor:['#2563eb','#1f9d57'],borderWidth:2,borderColor:'#fff'}]},
     options:{maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom'},
       tooltip:{callbacks:{label:c=>c.label+': '+money(c.raw)}}}}});
 }
@@ -931,7 +3660,7 @@ function renderTable(){
       <td>${p.roas?x(p.roas):'–'}</td>
       <td>${money(p.totalSales)}</td><td>${num(p.totalOrders)}</td>
       <td>${p.tacos?pct(p.tacos):'–'}</td><td>${p.troas?x(p.troas):'–'}</td>
-      <td class="l"><span class="badge ${b[0]}">${b[1]}</span></td></tr>`;
+      <td class="l"><span class="badge ${b[0]}">${b[1]}</span><button class="delx" data-asin="${p.asin}" title="Remove from dashboard">×</button></td></tr>`;
   }).join('') || `<tr><td colspan="11" style="text-align:center;padding:26px;color:#888">No products match.</td></tr>`;
   document.querySelectorAll('thead th').forEach(th=>th.classList.toggle('sorted',th.dataset.k===sortK));
 }
@@ -997,15 +3726,58 @@ function renderCompare(){
       <p style="color:#6c4ce0;font-weight:600">Baseline locked: ${H[0].label} · ${money(H[0].products.reduce((a,p)=>a+p.totalSales,0))} total sales · ${H[0].products.length} products.</p>
     </div>`; return;
   }
-  // 2+ periods: A vs B selector
+  // 2+ periods: full comparison controls
   const opt=H.map(h=>`<option value="${h.id}">${h.label}</option>`).join('');
+  const mOpts=[['totalSales','Total Sales'],['spend','Ad Spend'],['adSales','Ad Sales'],['adOrders','Ad Orders'],
+    ['totalOrders','Total Orders'],['acos','ACOS'],['roas','ROAS'],['tacos','TACOS']]
+    .map(m=>`<option value="${m[0]}">${m[1]}</option>`).join('');
   wrap.innerHTML=`<div class="cmp-pick">Compare
-    <select id="cmpA">${opt}</select> vs <select id="cmpB">${opt}</select></div>
-    <div class="kpis" id="cmpKpis"></div><div id="cmpTbl"></div>`;
-  const A=document.getElementById('cmpA'), B=document.getElementById('cmpB');
-  A.value=H[H.length-2].id; B.value=H[H.length-1].id;
-  const draw=()=>diffPeriods(H.find(h=>h.id===A.value),H.find(h=>h.id===B.value));
-  A.onchange=draw; B.onchange=draw; draw();
+    <select id="cmpA">${opt}</select> vs <select id="cmpB">${opt}</select>
+    <span style="opacity:.5">·</span> Table metric <select id="cmpMetric">${mOpts}</select>
+    <label style="font-size:12.5px;display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="cmpGainers" /> biggest movers first</label></div>
+    <div class="kpis" id="cmpKpis"></div>
+    <div class="card" style="margin-top:14px"><h3 id="cmpTblTitle">Per-product comparison</h3>
+      <p class="hint" id="cmpTblHint"></p>
+      <div class="tablewrap" style="box-shadow:none"><table id="cmpTable"><thead></thead><tbody></tbody></table></div></div>`;
+  const A=document.getElementById('cmpA'),B=document.getElementById('cmpB'),M=document.getElementById('cmpMetric'),G=document.getElementById('cmpGainers');
+  A.value=H[H.length-2].id; B.value=H[H.length-1].id; M.value='totalSales';
+  const draw=()=>{const a=H.find(h=>h.id===A.value),b=H.find(h=>h.id===B.value);diffPeriods(a,b);diffProducts(a,b,M.value,G.checked);};
+  A.onchange=draw; B.onchange=draw; M.onchange=draw; G.onchange=draw; draw();
+}
+function prodMetric(p,k){
+  if(!p) return 0;
+  if(k==='acos') return p.adSales?p.spend/p.adSales*100:0;
+  if(k==='roas') return p.spend?p.adSales/p.spend:0;
+  if(k==='tacos') return p.totalSales?p.spend/p.totalSales*100:0;
+  return p[k]||0;
+}
+function fmtMetric(k,v){
+  if(k==='acos'||k==='tacos') return v?pct(v):'–';
+  if(k==='roas') return v?x(v):'–';
+  if(k==='adOrders'||k==='totalOrders') return num(v);
+  return money(v);
+}
+function diffProducts(a,b,metric,sortByMove){
+  const labels={totalSales:'Total Sales',spend:'Ad Spend',adSales:'Ad Sales',adOrders:'Ad Orders',totalOrders:'Total Orders',acos:'ACOS',roas:'ROAS',tacos:'TACOS'};
+  document.getElementById('cmpTblTitle').textContent='Per-product comparison — '+labels[metric];
+  document.getElementById('cmpTblHint').textContent=`${a.label} vs ${b.label}, by ${labels[metric]} per product.`;
+  const am={},bm={}; a.products.forEach(p=>am[p.asin]=p); b.products.forEach(p=>bm[p.asin]=p);
+  const asins=[...new Set([...a.products,...b.products].map(p=>p.asin))];
+  let rows=asins.map(as=>{const pa=am[as],pb=bm[as];const sku=(pb||pa).sku;
+    const va=prodMetric(pa,metric),vb=prodMetric(pb,metric);
+    const d=va?((vb-va)/Math.abs(va)*100):(vb?100:0);
+    return {sku,va,vb,d};});
+  rows=rows.filter(r=>r.va||r.vb);
+  rows.sort((x,y)=> sortByMove ? Math.abs(y.d)-Math.abs(x.d) : y.vb-x.vb);
+  document.querySelector('#cmpTable thead').innerHTML=
+    `<tr><th class="l">Product</th><th>${a.label}</th><th>${b.label}</th><th>Change</th></tr>`;
+  const lowerBad = (metric==='acos'||metric==='tacos'||metric==='spend');
+  document.querySelector('#cmpTable tbody').innerHTML=rows.map(r=>{
+    const up=r.d>0.5, down=r.d<-0.5; const good= lowerBad ? down : up;
+    const cls=Math.abs(r.d)<0.5?'flat':good?'up':'down'; const arr=up?'▲':down?'▼':'■';
+    return `<tr><td class="l">${r.sku.replace(/^KD-/,'')}</td><td>${fmtMetric(metric,r.va)}</td>
+      <td>${fmtMetric(metric,r.vb)}</td><td><span class="delta ${cls}">${arr} ${Math.abs(r.d).toFixed(0)}%</span></td></tr>`;
+  }).join('');
 }
 function totOf(h,k){return h.products.reduce((a,p)=>a+(p[k]||0),0)}
 function diffPeriods(a,b){
@@ -1019,8 +3791,104 @@ function diffPeriods(a,b){
   }).join('');
 }
 
+// ---------- campaigns ----------
+function renderCampaigns(){
+  const wrap=document.getElementById('campWrap');
+  const q=(document.getElementById('campSearch').value||'').toLowerCase();
+  const pf=document.getElementById('campProd').value||'all';
+  if(CUR_CAMPS && CUR_CAMPS.length){
+    const byProd={}; CUR_CAMPS.forEach(c=>{(byProd[c.product]=byProd[c.product]||[]).push(c);});
+    let groups=Object.entries(byProd)
+      .map(([prod,list])=>[prod,list.filter(c=>(c.name+prod).toLowerCase().includes(q))])
+      .filter(([prod,list])=>list.length && (pf==='all'||prod===pf));
+    groups.sort((a,b)=>b[1].reduce((s,c)=>s+c.spend,0)-a[1].reduce((s,c)=>s+c.spend,0));
+    wrap.innerHTML=`<div class="card" style="margin-bottom:12px"><h3>Campaign performance</h3>
+      <p class="hint">${CUR_CAMPS.length} active campaigns from your reports, grouped by product (sorted by spend).</p></div>`+
+      (groups.map(([prod,list])=>{
+        list.sort((a,b)=>b.spend-a.spend); const tot=list.reduce((s,c)=>s+c.spend,0);
+        return `<div class="camp-group"><div class="camp-head"><span class="pname">${prod}</span>
+          <span class="pcount">${list.length} campaigns · ${money(tot)} spend</span></div>`+
+          list.map(c=>{const ac=c.sales?c.spend/c.sales*100:0,ro=c.spend?c.sales/c.spend:0,t=campType(c.name);
+            return `<div class="camp-row"><span class="ctype ${t}">${t}</span><span class="cn">${c.name}</span>
+              <span class="cm">${money(c.spend)} · ACOS ${c.sales?pct(ac):'–'} · ROAS ${c.spend?x(ro):'–'} · ${num(c.orders)} ord</span></div>`;
+          }).join('')+`</div>`;
+      }).join('') || `<div class="empty">No campaigns match.</div>`);
+  } else {
+    let groups=CAMPAIGN_GROUPS.filter(g=>pf==='all'||g.p===pf);
+    wrap.innerHTML=`<div class="card" style="margin-bottom:12px"><h3>Campaign map</h3>
+      <p class="hint">Your campaigns per product. Live spend / ACOS / ROAS per campaign appear here when a period with campaign-level data is selected (e.g. Jun 1-26).</p></div>`+
+      groups.map(g=>{
+        const camps=g.c.filter(n=>(n+g.p).toLowerCase().includes(q)); if(!camps.length) return '';
+        return `<div class="camp-group"><div class="camp-head"><span class="pname">${g.p}</span>
+          <span class="pasin">${g.a.join(', ')}</span><span class="pcount">${g.c.length} campaigns</span></div>`+
+          camps.map(n=>{const t=campType(n);return `<div class="camp-row"><span class="ctype ${t}">${t}</span><span class="cn">${n}</span></div>`;}).join('')+
+          (g.pend?`<div class="pendline">⏳ Pending / planned: ${g.pend}</div>`:'')+`</div>`;
+      }).join('');
+  }
+}
+function fillCampProd(){
+  const names=[...new Set(CAMPAIGN_GROUPS.map(g=>g.p))];
+  document.getElementById('campProd').innerHTML='<option value="all">All products</option>'+names.map(n=>`<option value="${n}">${n}</option>`).join('');
+}
+
+// ---------- forecast ----------
+function getDailySeries(){
+  const m={};
+  (D.daily||[]).forEach(d=>{ m[d.date]={date:d.date,totalSales:d.totalSales,totalOrders:d.totalOrders}; });
+  D.history.filter(h=>h.kind==='day').forEach(h=>{
+    m[h.start]={date:h.start, totalSales:h.products.reduce((a,p)=>a+(p.totalSales||0),0),
+                totalOrders:h.products.reduce((a,p)=>a+(p.totalOrders||0),0)};
+  });
+  return Object.values(m).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function computeForecast(series, horizon){
+  const n=series.length; if(n<3) return null;
+  const y=series.map(d=>d.totalSales), mx=(n-1)/2, my=y.reduce((a,b)=>a+b,0)/n;
+  let num=0,den=0; for(let i=0;i<n;i++){num+=(i-mx)*(y[i]-my);den+=(i-mx)*(i-mx);}
+  const b=den?num/den:0, a=my-b*mx;
+  const last7=y.slice(-7), ma7=last7.reduce((p,q)=>p+q,0)/last7.length;
+  let ss=0; for(let i=0;i<n;i++){const e=y[i]-(a+b*i);ss+=e*e;}
+  const std=Math.sqrt(ss/n);
+  const fc=[]; for(let i=0;i<horizon;i++){ const trend=a+b*(n+i); fc.push(Math.max(0,0.5*trend+0.5*ma7)); }
+  const next7=fc.slice(0,7).reduce((p,q)=>p+q,0), next30=fc.slice(0,30).reduce((p,q)=>p+q,0);
+  // future date labels
+  const last=series[n-1].date, base=new Date(last+'T00:00:00'), fdates=[];
+  for(let i=1;i<=horizon;i++){ const d=new Date(base); d.setDate(d.getDate()+i); fdates.push(d.toISOString().slice(0,10)); }
+  return {a,b,ma7,std,fc,fdates,next7,next30,trendPct: my? b/my*100:0};
+}
+function renderForecast(){
+  const series=getDailySeries(), box=document.getElementById('fcKpis'), note=document.getElementById('fcNote');
+  if(series.length<3){ box.innerHTML='';
+    document.getElementById('chForecast').style.opacity=.2;
+    note.textContent='Need at least 3 daily data points to forecast. Upload more daily files (or daily Business Reports) to activate the forecast.'; return; }
+  const f=computeForecast(series,30);
+  note.textContent=`Built from ${series.length} daily points (${series[0].date} → ${series[series.length-1].date}). Recalculates on every new upload.`;
+  const dir=f.b>0?'▲ growing':f.b<0?'▼ declining':'■ flat';
+  const dcls=f.b>0?'up':f.b<0?'down':'flat';
+  box.innerHTML=[
+    ['c-sales','7-day run-rate',money(f.ma7),'avg daily sales (last 7)'],
+    ['c-total','Projected next 7 days',money(f.next7),'sum of forecast'],
+    ['c-troas','Projected next 30 days',money(f.next30),'sum of forecast'],
+    ['c-roas','Trend',`<span class="delta ${dcls}">${dir}</span>`,`${f.trendPct>=0?'+':''}${f.trendPct.toFixed(1)}% / day`],
+  ].map(c=>`<div class="kpi ${c[0]}"><div class="lab"><span class="ic"></span>${c[1]}</div>
+    <div class="val">${c[2]}</div><div class="sub">${c[3]}</div></div>`).join('');
+  // chart
+  dead('fc'); const el=document.getElementById('chForecast'); el.style.opacity=1;
+  const labels=[...series.map(d=>d.date.slice(5)), ...f.fdates.map(d=>d.slice(5))];
+  const n=series.length;
+  const actual=[...series.map(d=>d.totalSales), ...Array(30).fill(null)];
+  const fcLine=[...Array(n-1).fill(null), series[n-1].totalSales, ...f.fc];
+  charts.fc=new Chart(el,{type:'line',data:{labels,datasets:[
+    {label:'Actual daily sales',data:actual,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.08)',
+      borderWidth:2,pointRadius:2,tension:.25,fill:true},
+    {label:'Forecast',data:fcLine,borderColor:'#c98a2b',borderDash:[6,4],borderWidth:2,pointRadius:0,tension:.25,fill:false}]},
+    options:{maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},
+      scales:{y:{ticks:{callback:v=>money(v)}},x:{ticks:{maxTicksLimit:14,font:{size:10}}}},
+      plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw==null?'–':money(c.raw))}}}}});
+}
+
 // ---------- render orchestration ----------
-function renderAll(){ renderKPIs(); renderCharts(); renderTable(); renderInsights(); renderAlerts(); renderCompare(); }
+function renderAll(){ renderKPIs(); renderCharts(); renderTable(); renderCampaigns(); renderInsights(); renderAlerts(); renderForecast(); renderCompare(); }
 
 /* =========================================================================
    IN-BROWSER UPLOAD + CONSOLIDATION  (mirrors scripts/build_data.py)
@@ -1158,20 +4026,63 @@ function resetData(){
   document.getElementById('ulog').classList.remove('show'); document.getElementById('ulog').innerHTML='';
 }
 
+let MODE='period';
+function listForMode(){
+  return MODE==='day' ? D.history.filter(h=>h.kind==='day') : D.history.slice();
+}
 function refreshPeriodSelector(){
   const latest=D.history[D.history.length-1];
   document.getElementById('freshness').textContent='Updated '+latest.end;
   const sel=document.getElementById('periodSel');
-  sel.innerHTML=D.history.map(h=>`<option value="${h.id}">${h.label} (${h.start} → ${h.end})</option>`).join('');
-  sel.value=latest.id;
+  const list=listForMode();
+  if(!list.length){
+    sel.innerHTML='<option value="">— no day-wise data yet · upload daily files —</option>';
+    sel.value=''; return '';
+  }
+  sel.innerHTML=list.map(h=>`<option value="${h.id}">${h.label}${h.start===h.end?'':' ('+h.start+' → '+h.end+')'}</option>`).join('');
+  sel.value=list[list.length-1].id;
+  return sel.value;
+}
+function setMode(m){
+  MODE=m;
+  document.querySelectorAll('#viewMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  const sel=document.getElementById('periodSel'), rb=document.getElementById('rangeCtrls');
+  if(m==='range'){ sel.style.display='none'; rb.classList.add('show'); return; }
+  sel.style.display=''; rb.classList.remove('show');
+  const id=refreshPeriodSelector();
+  if(id) loadPeriod(id);   // if empty (no daily data), keep current view; hint shows in dropdown
+}
+function loadRange(s,e){
+  if(!s||!e) return;
+  if(s>e){ const t=s; s=e; e=t; }
+  const days=D.history.filter(h=>h.kind==='day' && h.start>=s && h.end<=e);
+  if(!days.length){ alert('No daily data points in that range yet.\nUpload daily files (one date each) to use custom ranges.'); return; }
+  const map={};
+  days.forEach(h=>h.products.forEach(p=>{
+    const m=map[p.asin]||(map[p.asin]={asin:p.asin,sku:p.sku,title:p.title,channels:[],
+      spend:0,adSales:0,adOrders:0,impr:0,clicks:0,totalSales:0,totalOrders:0});
+    ['spend','adSales','adOrders','impr','clicks','totalSales','totalOrders'].forEach(k=>m[k]+=p[k]||0);
+    (p.channels||[]).forEach(c=>{ if(!m.channels.includes(c)) m.channels.push(c); });
+  }));
+  CUR=applyPortfolio(Object.values(map).map(enrich));
+  CUR_CAMPS=[];
+  document.getElementById('provNote').textContent=days.length+' day(s) aggregated: '+s+' → '+e;
+  renderAll();
 }
 
 // ---------- wiring ----------
 function init(){
   document.getElementById('mgr').textContent=D.brand.manager;
+  if(window.LOGOS){ document.getElementById('brandLogo').src=LOGOS.kidology;
+    document.getElementById('amazonLogo').src=LOGOS.amazon; }
   const latest=D.history[D.history.length-1];
   refreshPeriodSelector();
-  document.getElementById('periodSel').onchange=e=>loadPeriod(e.target.value);
+  document.getElementById('periodSel').onchange=e=>{ if(e.target.value) loadPeriod(e.target.value); };
+  document.querySelectorAll('#viewMode button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+  document.getElementById('rangeApply').onclick=()=>loadRange(
+    document.getElementById('rangeStart').value, document.getElementById('rangeEnd').value);
+  document.getElementById('rangeStart').value=D.history[0].start;
+  document.getElementById('rangeEnd').value=D.history[D.history.length-1].end;
 
   // ---- upload wiring ----
   const drop=document.getElementById('drop'), fi=document.getElementById('fileInput');
@@ -1192,6 +4103,11 @@ function init(){
     t.classList.add('active'); document.getElementById('v-'+t.dataset.v).classList.add('active');
   });
   document.getElementById('search').oninput=renderTable;
+  document.getElementById('addProdBtn').onclick=addProduct;
+  document.getElementById('pbody').addEventListener('click',e=>{const b=e.target.closest('.delx'); if(b) deleteProduct(b.dataset.asin);});
+  fillCampProd();
+  document.getElementById('campSearch').oninput=renderCampaigns;
+  document.getElementById('campProd').onchange=renderCampaigns;
   document.querySelectorAll('#statusFilter button').forEach(b=>b.onclick=()=>{
     document.querySelectorAll('#statusFilter button').forEach(z=>z.classList.remove('on'));
     b.classList.add('on'); filt=b.dataset.f; renderTable();
