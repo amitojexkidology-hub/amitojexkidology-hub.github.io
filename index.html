@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Kidology — Ads Live Dashboard</title>
+<meta name="theme-color" content="#5b2be0" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#eef1f8; --card:#ffffff; --ink:#15182b; --muted:#6b7192; --line:#e7eaf3;
+    --purple:#6c4ce0; --indigo:#4f46e5; --teal:#14b8a6; --coral:#ff6b6b;
+    --amber:#f59e0b; --blue:#3b82f6; --green:#22c55e; --pink:#ec4899; --sky:#0ea5e9;
+    --good:#16a34a; --watch:#d97706; --alert:#dc2626; --star:#7c3aed;
+    --shadow:0 6px 22px rgba(30,28,80,.08); --shadow-lg:0 14px 40px rgba(30,28,80,.14);
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased;
+    padding-bottom:48px;
+  }
+  h1,h2,h3,.brandname{font-family:'Poppins',sans-serif}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+
+  /* ---------- header ---------- */
+  header.hero{
+    background:linear-gradient(120deg,#5b2be0 0%,#7c3aed 38%,#d6326b 78%,#ff7a45 100%);
+    color:#fff; padding:22px 0 70px; position:relative; overflow:hidden;
+  }
+  header.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;
+    background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);border-radius:50%}
+  .hero-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.16);
+    display:grid;place-items:center;font-size:26px;backdrop-filter:blur(4px);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+  .brandname{font-size:24px;font-weight:800;letter-spacing:.2px;line-height:1}
+  .brandsub{font-size:12.5px;opacity:.9;margin-top:3px}
+  .hero-meta{margin-left:auto;text-align:right;font-size:12px;opacity:.95}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);
+    padding:5px 11px;border-radius:999px;font-size:12px;font-weight:600;margin-top:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#7CFFB2;box-shadow:0 0 0 4px rgba(124,255,178,.25)}
+  .hero-h{margin:18px 0 2px;font-size:15px;font-weight:600;opacity:.95}
+  .period-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  select.period{font-family:inherit;font-weight:600;font-size:13px;color:#3a1c8a;
+    border:none;border-radius:10px;padding:8px 12px;background:#fff;box-shadow:var(--shadow)}
+  .prov{font-size:11.5px;background:rgba(0,0,0,.18);padding:5px 10px;border-radius:8px}
+
+  /* ---------- tabs ---------- */
+  nav.tabs{position:sticky;top:0;z-index:30;background:rgba(238,241,248,.86);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .tabs-in{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;max-width:1180px;margin:0 auto;
+    -ms-overflow-style:none;scrollbar-width:none}
+  .tabs-in::-webkit-scrollbar{display:none}
+  .tab{white-space:nowrap;border:1px solid var(--line);background:#fff;color:var(--muted);
+    font-weight:600;font-size:13.5px;padding:9px 15px;border-radius:999px;cursor:pointer;transition:.15s}
+  .tab.active{background:linear-gradient(120deg,var(--purple),var(--pink));color:#fff;border-color:transparent;box-shadow:var(--shadow)}
+
+  main{margin-top:-46px}
+  section.view{display:none;animation:fade .25s ease}
+  section.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---------- KPI cards ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kpi{background:var(--card);border-radius:var(--r);padding:16px 16px 14px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;border:1px solid var(--line)}
+  .kpi .lab{font-size:12px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:7px}
+  .kpi .val{font-family:'Poppins';font-weight:800;font-size:26px;margin-top:7px;line-height:1.05}
+  .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:5px}
+  .kpi .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:14px;color:#fff}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+  .kpi.c-spend::before{background:var(--coral)} .kpi.c-spend .ic{background:var(--coral)}
+  .kpi.c-sales::before{background:var(--teal)} .kpi.c-sales .ic{background:var(--teal)}
+  .kpi.c-total::before{background:var(--indigo)} .kpi.c-total .ic{background:var(--indigo)}
+  .kpi.c-acos::before{background:var(--amber)} .kpi.c-acos .ic{background:var(--amber)}
+  .kpi.c-roas::before{background:var(--green)} .kpi.c-roas .ic{background:var(--green)}
+  .kpi.c-tacos::before{background:var(--pink)} .kpi.c-tacos .ic{background:var(--pink)}
+  .kpi.c-troas::before{background:var(--sky)} .kpi.c-troas .ic{background:var(--sky)}
+  .kpi.c-ord::before{background:var(--purple)} .kpi.c-ord .ic{background:var(--purple)}
+
+  /* ---------- cards / charts ---------- */
+  .grid2{display:grid;grid-template-columns:1.25fr .85fr;gap:14px;margin-top:14px}
+  .card{background:var(--card);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--line)}
+  .card h3{margin:0 0 2px;font-size:15px}
+  .card .hint{font-size:12px;color:var(--muted);margin:0 0 12px}
+  .chartbox{position:relative;height:300px}
+  .chartbox.sm{height:260px}
+
+  /* ---------- table ---------- */
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .search{flex:1;min-width:180px;border:1px solid var(--line);border-radius:11px;padding:10px 13px;font:inherit;font-size:14px}
+  .seg{display:flex;gap:4px;background:#eef0f7;padding:4px;border-radius:11px}
+  .seg button{border:none;background:transparent;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);
+    padding:7px 12px;border-radius:8px;cursor:pointer}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .tablewrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line);background:#fff;box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+  thead th{position:sticky;top:0;background:#fafbff;text-align:right;padding:12px 12px;font-weight:700;
+    color:var(--muted);font-size:11.5px;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--line)}
+  thead th.l,tbody td.l{text-align:left}
+  thead th.sorted{color:var(--purple)}
+  tbody td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  tbody tr:hover{background:#faf9ff}
+  .prod{display:flex;flex-direction:column;gap:1px;max-width:230px}
+  .prod .sku{font-weight:700;font-size:12.5px}
+  .prod .asin{font-size:11px;color:var(--muted)}
+  .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
+  .b-star{background:#f1ecff;color:var(--star)} .b-good{background:#e7f8ee;color:var(--good)}
+  .b-watch{background:#fff4e3;color:var(--watch)} .b-alert{background:#fdeaea;color:var(--alert)}
+  .chan{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:5px;padding:1px 5px;margin-left:3px}
+  .chan.SP{background:var(--blue)} .chan.SB{background:var(--purple)} .chan.SD{background:var(--teal)}
+
+  /* ---------- alerts ---------- */
+  .alert-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .alert-card{background:#fff;border-radius:14px;padding:14px 15px;box-shadow:var(--shadow);border:1px solid var(--line);
+    border-left:5px solid var(--line)}
+  .alert-card.lv-alert{border-left-color:var(--alert)}
+  .alert-card.lv-watch{border-left-color:var(--watch)}
+  .alert-card .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .alert-card .sku{font-weight:700;font-size:13.5px}
+  .alert-card ul{margin:9px 0 0;padding-left:17px;font-size:12.5px;color:#444}
+  .alert-card li{margin:3px 0}
+  .empty{padding:34px;text-align:center;color:var(--muted);background:#fff;border-radius:var(--r);box-shadow:var(--shadow)}
+
+  /* ---------- insights ---------- */
+  .ins-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .ins{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);border:1px solid var(--line)}
+  .ins h4{margin:0 0 6px;font-size:13.5px;font-family:'Poppins';display:flex;gap:8px;align-items:center}
+  .ins p{margin:0;font-size:12.5px;color:#475}
+  .mini{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
+  .mini b{font-family:'Poppins';font-size:14px} .mini span{display:block;font-size:10.5px;color:var(--muted)}
+
+  /* ---------- compare ---------- */
+  .note{background:#fff;border:1px dashed #c9c2f0;border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+  .note h3{margin:0 0 6px;color:var(--purple)}
+  .note p{margin:6px 0;font-size:13.5px;color:#444;line-height:1.55}
+  .cmp-pick{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .cmp-pick select{font:inherit;font-weight:600;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff}
+  .delta{font-weight:700;font-size:12px}
+  .up{color:var(--good)} .down{color:var(--alert)} .flat{color:var(--muted)}
+
+  /* ---------- upload ---------- */
+  .drop{border:2.5px dashed #b9aef0;border-radius:var(--r);background:#fff;padding:30px 20px;text-align:center;
+    transition:.18s;cursor:pointer}
+  .drop.over{border-color:var(--purple);background:#f6f3ff;transform:scale(1.005)}
+  .drop .big{font-size:34px} .drop h3{margin:8px 0 4px} .drop p{margin:0;color:var(--muted);font-size:13px}
+  .roles{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:14px}
+  .role{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow)}
+  .role .rt{font-weight:700;font-size:12px} .role .rs{font-size:18px;margin-top:3px}
+  .role.ok{border-color:#9ae6b4;background:#f0fdf6} .role.miss{opacity:.55}
+  .role .fn{font-size:9.5px;color:var(--muted);margin-top:3px;word-break:break-all;line-height:1.2;max-height:24px;overflow:hidden}
+  .ucfg{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:14px}
+  .ucfg label{font-size:11.5px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
+  .ucfg input,.ucfg select{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .btn{font:inherit;font-weight:700;font-size:14px;border:none;border-radius:12px;padding:11px 20px;cursor:pointer;color:#fff;
+    background:linear-gradient(120deg,var(--purple),var(--pink));box-shadow:var(--shadow)}
+  .btn.ghost{background:#fff;color:var(--purple);border:1px solid #ddd4f5;box-shadow:none}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .ulog{margin-top:14px;background:#0f1226;color:#c8f7d8;border-radius:12px;padding:12px 14px;font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;
+    max-height:200px;overflow:auto;display:none}
+  .ulog.show{display:block} .ulog .e{color:#ff9b9b} .ulog .w{color:#ffd479}
+  .uactions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+  .step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+  .step b{display:block;font-family:'Poppins';color:var(--purple);font-size:13px;margin-bottom:3px}
+  .step span{font-size:12px;color:#555}
+
+  .foot{margin-top:22px;text-align:center;font-size:11.5px;color:var(--muted)}
+
+  @media(max-width:880px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}
+    .alert-list,.ins-grid{grid-template-columns:1fr}
+    .brandname{font-size:21px}
+  }
+  @media(max-width:420px){ .kpi .val{font-size:22px} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div class="logo">🧸</div>
+      <div>
+        <div class="brandname">Kidology</div>
+        <div class="brandsub">Amazon Ads — Live Performance Dashboard</div>
+      </div>
+      <div class="hero-meta">
+        <div>Managed by <b id="mgr">Amitoje Bakshi</b></div>
+        <div class="pill"><span class="dot"></span><span id="freshness">Updated —</span></div>
+      </div>
+    </div>
+    <div class="hero-h">Reporting period</div>
+    <div class="period-row">
+      <select class="period" id="periodSel"></select>
+      <span class="prov" id="provNote">ⓘ Latest period may be provisional — Amazon finalises data over ~1–3 days.</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabs-in" id="tabbar">
+    <button class="tab active" data-v="overview">📊 Overview</button>
+    <button class="tab" data-v="products">📦 Products</button>
+    <button class="tab" data-v="insights">💡 Insights</button>
+    <button class="tab" data-v="alerts">🚨 Alerts <span id="alertCount"></span></button>
+    <button class="tab" data-v="compare">🔀 Compare</button>
+    <button class="tab" data-v="upload">⬆️ Upload data</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- OVERVIEW -->
+  <section class="view active" id="v-overview">
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Top products — Spend vs Ad Sales</h3>
+        <p class="hint">Where your ad budget goes and what it returns (top 10 by spend).</p>
+        <div class="chartbox"><canvas id="chSpendSales"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Spend share</h3>
+        <p class="hint">Budget concentration across products.</p>
+        <div class="chartbox"><canvas id="chShare"></canvas></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>ACOS by product</h3>
+        <p class="hint">Ad efficiency. Bars above the dashed line need attention.</p>
+        <div class="chartbox"><canvas id="chAcos"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Ad-driven vs Organic sales</h3>
+        <p class="hint">How much of total revenue is attributed to ads vs organic.</p>
+        <div class="chartbox sm"><canvas id="chAdOrg"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="view" id="v-products">
+    <div class="toolbar">
+      <input class="search" id="search" placeholder="🔍 Search SKU or ASIN…" />
+      <div class="seg" id="statusFilter">
+        <button class="on" data-f="all">All</button>
+        <button data-f="alert">Alerts</button>
+        <button data-f="watch">Watch</button>
+        <button data-f="good">Healthy</button>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table id="ptable">
+        <thead><tr>
+          <th class="l" data-k="sku">Product</th>
+          <th data-k="spend">Spend</th>
+          <th data-k="adSales">Ad Sales</th>
+          <th data-k="adOrders">Ad Orders</th>
+          <th data-k="acos">ACOS</th>
+          <th data-k="roas">ROAS</th>
+          <th data-k="totalSales">Total Sales</th>
+          <th data-k="totalOrders">Tot Ord</th>
+          <th data-k="tacos">TACOS</th>
+          <th data-k="troas">TROAS</th>
+          <th class="l" data-k="status">Status</th>
+        </tr></thead>
+        <tbody id="pbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- INSIGHTS -->
+  <section class="view" id="v-insights">
+    <div class="card" style="margin-bottom:14px">
+      <h3>Portfolio read</h3>
+      <p class="hint" id="portfolioRead">—</p>
+    </div>
+    <div class="ins-grid" id="insGrid"></div>
+  </section>
+
+  <!-- ALERTS -->
+  <section class="view" id="v-alerts">
+    <div id="alertWrap"></div>
+  </section>
+
+  <!-- COMPARE -->
+  <section class="view" id="v-compare">
+    <div id="cmpWrap"></div>
+  </section>
+
+  <!-- UPLOAD -->
+  <section class="view" id="v-upload">
+    <div class="card" style="margin-bottom:6px">
+      <h3>⬆️ Upload your Amazon reports</h3>
+      <p class="hint">Drop the day's files below — the dashboard reads them in your browser (nothing is sent anywhere) and updates instantly. Your data is saved on this device so history builds up for the comparisons.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><b>1 · Drop files</b><span>SP, SB & SD (Happy Cheeks + Kidology) and the Business Report. Drop all at once — they're auto-sorted.</span></div>
+      <div class="step"><b>2 · Set the date</b><span>Pick the day/period these reports cover and give it a short label.</span></div>
+      <div class="step"><b>3 · Process</b><span>Hit “Process &amp; add”. The new point appears in every tab and the comparison engine.</span></div>
+    </div>
+
+    <div class="drop" id="drop">
+      <div class="big">📥</div>
+      <h3>Drop files here</h3>
+      <p>or click to choose · accepts .xlsx and .csv · you can also drop fewer (e.g. only SP) </p>
+      <input type="file" id="fileInput" multiple accept=".xlsx,.csv" style="display:none" />
+    </div>
+
+    <div class="roles" id="roles"></div>
+
+    <div class="ucfg">
+      <div><label>Label (shown in dropdown)</label><input id="uLabel" placeholder="e.g. 27 Jun" /></div>
+      <div><label>Start date</label><input id="uStart" type="date" /></div>
+      <div><label>End date</label><input id="uEnd" type="date" /></div>
+      <div><label>Type</label><select id="uKind"><option value="day">Single day</option><option value="period">Period / range</option></select></div>
+      <button class="btn" id="processBtn" disabled>⚙️ Process &amp; add</button>
+    </div>
+
+    <div class="ulog" id="ulog"></div>
+
+    <div class="uactions">
+      <button class="btn ghost" id="downloadBtn">💾 Download updated data.js (to publish for your seniors)</button>
+      <button class="btn ghost" id="resetBtn">↺ Reset to baseline</button>
+    </div>
+    <p class="hint" style="margin-top:10px">Publishing tip: after uploading, click <b>Download updated data.js</b> and replace <code>data/data.js</code> on your host so everyone with the link sees the new numbers. (I can automate this away with a connected backend later — ask me.)</p>
+  </section>
+
+  <div class="foot">
+    Kidology Ads Dashboard · data consolidated from Sponsored Products, Brands & Display + Business Report.
+    Figures in ₹ (INR). Built for Amitoje Bakshi.
+  </div>
+</main>
+
+<script>
+// Auto-generated by scripts/build_data.py - do not edit by hand.
+window.DASHBOARD_DATA = {
+ "brand": {
+  "name": "Kidology",
+  "manager": "Amitoje Bakshi"
+ },
+ "meta": {
+  "generatedAt": "2026-06-20",
+  "latestId": "2026-06-01_2026-06-20",
+  "currency": "INR"
+ },
+ "history": [
+  {
+   "id": "2026-06-01_2026-06-20",
+   "label": "Jun 1-20",
+   "start": "2026-06-01",
+   "end": "2026-06-20",
+   "kind": "period",
+   "products": [
+    {
+     "asin": "B0GC5DK8CW",
+     "sku": "KD-BABYSTACKER-051",
+     "title": "Kidology Ring Stacker Baby Toy for 6+ Month Old Baby | Sensory Stacking Rings with Rattle for Brain Development | Montessori Cognitive Toy for Kids 6-12 Months | Motor Skill STEM Gift Boys & Girls",
+     "spend": 1949.77,
+     "adSales": 7684.73,
+     "adOrders": 16,
+     "impr": 52446,
+     "clicks": 228,
+     "totalSales": 7485.0,
+     "totalOrders": 15,
+     "channels": [
+      "SD",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FX48DHCN",
+     "sku": "KD-SASSYSTACKER-041",
+     "title": "Kidology Ring Stacker Baby Toy for 6+ Month Old Baby | Sensory Stacking Rings with Rattle for Brain Development | Montessori Cognitive Toy for Kids 6-12 Months | Motor Skill STEM Gift Boys & Girls",
+     "spend": 3106.4,
+     "adSales": 12876.960000000001,
+     "adOrders": 26,
+     "impr": 59535,
+     "clicks": 380,
+     "totalSales": 10977.78,
+     "totalOrders": 22,
+     "channels": [
+      "SB",
+      "SD",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GVK9LF4D",
+     "sku": "KD-LIZARD-GR-027",
+     "title": "Kidology Wall Climbing RC Lizard Toy | Remote Control Gecko that Crawls on Walls & Ceilings | 360° Stunt RC with LED Eyes | Prank & Thrill Gift for Boys & Girls",
+     "spend": 30010.409999999996,
+     "adSales": 180465.00000000006,
+     "adOrders": 155,
+     "impr": 301123,
+     "clicks": 4749,
+     "totalSales": 263141.0,
+     "totalOrders": 209,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GW375CMP",
+     "sku": "KD-MGTTILES-42P-004",
+     "title": "Kidology Magnetic Tiles for Kids (42 PCS) | Travel Set STEM Building Blocks | Educational Construction Toys for 3 4 5 Years | Colorful Blocks for Creative Play & Imaginative Learning (Multicolor)",
+     "spend": 58773.469060000025,
+     "adSales": 446177.3100000002,
+     "adOrders": 506,
+     "impr": 702393,
+     "clicks": 6271,
+     "totalSales": 762881.0,
+     "totalOrders": 771,
+     "channels": [
+      "SD",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GV4FH6MV",
+     "sku": "KD-POLICEBOOK-054",
+     "title": "Kidology Beep Montessori Car Book Toy for Toddlers | Interactive Police Car Activity Book with Lights, Music & Sound Effects | Educational Sensory Toy for Babies & Kids",
+     "spend": 17493.239999999998,
+     "adSales": 75357.84,
+     "adOrders": 109,
+     "impr": 307764,
+     "clicks": 2178,
+     "totalSales": 41657.0,
+     "totalOrders": 45,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GVKGB7N1",
+     "sku": "KD-ENGWORD-035",
+     "title": "Kidology My First English Words Sound Book for Kids | 470+ Words Interactive Talking & Musical Learning Book with 21 Topics, Built-in Quiz, Nursery Rhymes & Piano | Educational Audio Toy Age 3+",
+     "spend": 13746.95,
+     "adSales": 76513.44000000005,
+     "adOrders": 80,
+     "impr": 114110,
+     "clicks": 1390,
+     "totalSales": 187042.44,
+     "totalOrders": 169,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GVS3DX6R",
+     "sku": "KD-NAILMARKER-082",
+     "title": "Kidology 12 Colors DIY Nail Art Pens Set – 0.5mm | Ultra Fine Tip Nail Art Marker Pens | Quick Dry Waterproof Nail Polish Pens for DIY Nail Art Kit for Women, Girls & Kids (Beginner Friendly)",
+     "spend": 13043.868149999998,
+     "adSales": 68435.46,
+     "adOrders": 133,
+     "impr": 114976,
+     "clicks": 1613,
+     "totalSales": 78842.0,
+     "totalOrders": 146,
+     "channels": [
+      "SD",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GN1F7J7G",
+     "sku": "KD-NAILMARKER-692",
+     "title": "Kidology 12 Colors DIY Nail Art Pens Set | 0.5mm Ultra Fine Nail Art Marker Pens | Quick Dry Waterproof Nail Polish Pens for DIY Nail Painting | Nail Art Kit for Women & Kids",
+     "spend": 41306.36000000001,
+     "adSales": 153078.64,
+     "adOrders": 313,
+     "impr": 548550,
+     "clicks": 7283,
+     "totalSales": 472055.0,
+     "totalOrders": 921,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0GW888T9B",
+     "sku": "KD-DUCK-YL-004",
+     "title": "Kidology Musical Dancing Duck Toy with Lights & Music for Kids| Interactive Walking & Moving Duck Toy | Battery Operated Light & Sound Toy | Activity & Sensory Play Toy | Gift for Boys & Girls",
+     "spend": 14958.38,
+     "adSales": 66364.19,
+     "adOrders": 85,
+     "impr": 230352,
+     "clicks": 2500,
+     "totalSales": 55945.0,
+     "totalOrders": 53,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0F6NR3VGY",
+     "sku": "KD-FRUITTEETHER-P5-331",
+     "title": "Kidology Fruit Shaped Teethers for Babies 6+ Months, BPA-Free Silicone Teething Toy for Infants, Natural Organic Freezer Safe & Soft Toys for Toddlers|Ideal Gift for Baby Girls & Boys | Set of 5",
+     "spend": 9753.63,
+     "adSales": 43294.04000000001,
+     "adOrders": 146,
+     "impr": 199318,
+     "clicks": 1441,
+     "totalSales": 54119.0,
+     "totalOrders": 181,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0G941M82L",
+     "sku": "KD-FAIRYWINGS-087",
+     "title": "Kidology Electric Butterfly Wings for Girls 3+ Years | LED Light-Up Moving Magical Fairy Wings with Music | Princess Costume Accessory for Halloween, Christmas & Birthday Parties",
+     "spend": 7090.02,
+     "adSales": 47213.28,
+     "adOrders": 31,
+     "impr": 166994,
+     "clicks": 1451,
+     "totalSales": 55769.0,
+     "totalOrders": 31,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0H1H6GJG3",
+     "sku": "KD-FLRBBBL-803",
+     "title": "Kidology Dancing Sunflower Bubble Machine for Kids & Adults | Rechargeable Electric Bubble Maker with LED Lights | Bubble Gun Toy for Boys & Girls | Birthday Party Gift Toy",
+     "spend": 15621.019999999999,
+     "adSales": 108443.79000000001,
+     "adOrders": 135,
+     "impr": 311097,
+     "clicks": 2933,
+     "totalSales": 129456.0,
+     "totalOrders": 148,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0D7SPNLMQ",
+     "sku": "KD-FLYINGCAR-BL-45",
+     "title": "Kidology 2-in-1 Transforming Car Airplane Toy for Kids | Boosts Cognitive & Sensory Development | LED Lights Music & Projection | 360° Bump & Go Action | Gift for Boys & Girls, Blue",
+     "spend": 21809.140000000007,
+     "adSales": 89245.93999999999,
+     "adOrders": 109,
+     "impr": 523891,
+     "clicks": 3980,
+     "totalSales": 71775.0,
+     "totalOrders": 80,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FYFZQJDD",
+     "sku": "KD-MIRRORBOOK-WTH-D1-591",
+     "title": "Kidology Baby Mirror Book Toy | Infant Sensory Development with Soft Silicone Teether Tummy Time with High Contrast Black & White Cards ,Flaps & Foldable Design | New Born Gifts for 0–24 Months",
+     "spend": 4905.210000000001,
+     "adSales": 20162.809999999998,
+     "adOrders": 48,
+     "impr": 105914,
+     "clicks": 646,
+     "totalSales": 27445.0,
+     "totalOrders": 59,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DRMDWVRH",
+     "sku": "KD-5IN1-METALENGINEER-YL-53-New",
+     "title": "Kidology 5-in-1 Construction Robot Toy Set for Boys & Girls| Transforming DIY Assembly Truck & Vehicle Action Figure Play Set | STEM Building & Modular Combination Design | Multicolor",
+     "spend": 8406.289999999999,
+     "adSales": 51526.659999999996,
+     "adOrders": 54,
+     "impr": 349304,
+     "clicks": 2113,
+     "totalSales": 38959.57,
+     "totalOrders": 39,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DR8GVQ24",
+     "sku": "KD-5IN1-METALFIRE-RD-53",
+     "title": "Kidology 5-in-1 Fire Rescue Robot Vehicle Set for Boys & Girls | Transforming Fire Truck Action Figure Model | DIY Assembly Playset with Pull-Back Cars & Rotating Parts | Collectible Desk Toy",
+     "spend": 5724.200000000001,
+     "adSales": 41143.68,
+     "adOrders": 44,
+     "impr": 143554,
+     "clicks": 1322,
+     "totalSales": 49950.0,
+     "totalOrders": 53,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DRVK24MF",
+     "sku": "KD-5IN1-DINOSAUR-53",
+     "title": "Kidology 5-in-1 Robot Dinosaur Toy Set for Boys & Girls | DIY Transforming Dino Vehicle Assembly Play Set | STEM Building & Action Figure Toy with Modular Combination Design | Multicolor",
+     "spend": 6990.88,
+     "adSales": 21215.019999999997,
+     "adOrders": 24,
+     "impr": 313479,
+     "clicks": 1730,
+     "totalSales": 52946.47,
+     "totalOrders": 53,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DRVLH61R",
+     "sku": "KD-5IN1-CONSTRUCTION-YL-53",
+     "title": "Kidology 5-in-1 Construction Robot Toy Set for Boys & Girls| Transforming DIY Assembly Truck & Vehicle Action Figure Play Set | STEM Building & Modular Combination Design | Multicolor",
+     "spend": 6656.81,
+     "adSales": 22553.57,
+     "adOrders": 28,
+     "impr": 390263,
+     "clicks": 1782,
+     "totalSales": 23969.0,
+     "totalOrders": 24,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0DRVJW2ZB",
+     "sku": "KD-5IN1-FIRE-RD-53",
+     "title": "Kidology 5-in-1 Fire Rescue Robot Vehicle Set for Boys & Girls | Transforming Fire Truck Action Figure Model | DIY Assembly Playset with Pull-Back Cars & Rotating Parts | Collectible Desk Toy",
+     "spend": 5086.259999999998,
+     "adSales": 26203.66,
+     "adOrders": 28,
+     "impr": 139517,
+     "clicks": 1219,
+     "totalSales": 31968.0,
+     "totalOrders": 33,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0D296NGGK",
+     "sku": "KD-BUSYBOARD-DOUBLESIDE-33",
+     "title": "Kidology Montessori Busy Board Toy to Develop Basic Skills, Educational Sensory Board Travel Toys for Plane Car Aged 3+ Kids, Activity Parents-Kids Travelling Toys,multicolor",
+     "spend": 120.96,
+     "adSales": 0.0,
+     "adOrders": 0,
+     "impr": 7148,
+     "clicks": 22,
+     "totalSales": 699.0,
+     "totalOrders": 1,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0H4B3GMRF",
+     "sku": "KD-OCTAGON-S20",
+     "title": "",
+     "spend": 60.46,
+     "adSales": 379.98,
+     "adOrders": 1,
+     "impr": 2979,
+     "clicks": 15,
+     "totalSales": 0.0,
+     "totalOrders": 0,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FX9G36HP",
+     "sku": "KD-SMOKEDRIFTCAR-RD-093",
+     "title": "Kidology RC Drift Car with Smoke Effect for Kids & Teens | 1:36 Remote Control Racing Car with LED Lights & Sound | High Speed Drift RC Car for Indoor Outdoor Play (Red)",
+     "spend": 1097.4,
+     "adSales": 1331.42,
+     "adOrders": 2,
+     "impr": 67806,
+     "clicks": 271,
+     "totalSales": 998.99,
+     "totalOrders": 1,
+     "channels": [
+      "SB",
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FX9J89K5",
+     "sku": "KD-CARRYBAG-BR-071",
+     "title": "Kidology Cottage Style Makeup Carry Bag for Kids & Girls | Premium Large Capacity Cosmetic Organizer Pouch | House Shaped Vanity Travel Bag for Makeup, Skincare & Baby Nail Trimmer Storage- Brown",
+     "spend": 346.94000000000005,
+     "adSales": 475.24,
+     "adOrders": 1,
+     "impr": 9806,
+     "clicks": 89,
+     "totalSales": 7984.0,
+     "totalOrders": 16,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FX9HFVH9",
+     "sku": "KD-CARRYBAG-YL-071",
+     "title": "Kidology Cartoon Cottage Makeup Bag for Women & Girls | Large Travel Vanity Organizer with Handle | Stylish House Shaped Cosmetic Pouch for Makeup Tools, Baby Nail Trimmer & Beauty Essentials- Yellow",
+     "spend": 91.29000000000002,
+     "adSales": 475.24,
+     "adOrders": 1,
+     "impr": 3341,
+     "clicks": 26,
+     "totalSales": 9980.0,
+     "totalOrders": 20,
+     "channels": [
+      "SP"
+     ]
+    },
+    {
+     "asin": "B0FX9G7PR5",
+     "sku": "KD-CARRYBAG-BU-071",
+     "title": "Kidology Cartoon Style Carry Makeup Bag for Women & Girls | Large Capacity Travel Cosmetic Organizer Pouch | Cute House Shaped Vanity Bag | Ideal for Storing Makeup Tool - Blue",
+     "spend": 572.35,
+     "adSales": 2756.1800000000003,
+     "adOrders": 5,
+     "impr": 14986,
+     "clicks": 139,
+     "totalSales": 7485.0,
+     "totalOrders": 14,
+     "channels": [
+      "SP"
+     ]
+    }
+   ]
+  }
+ ]
+};
+
+</script>
+<script>
+const D = window.DASHBOARD_DATA;
+const PALETTE = ['#6c4ce0','#14b8a6','#ff6b6b','#f59e0b','#3b82f6','#22c55e','#ec4899','#0ea5e9','#8b5cf6','#f97316'];
+const TARGET_ACOS = 25; // % threshold line
+const LS_KEY = 'kidology_history_v1';
+
+// merge any locally-saved (uploaded) periods on top of the bundled baseline
+function mergeHistory(){
+  let saved=[]; try{ saved=JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){}
+  const byId={}; (D.baseHistory||D.history).forEach(e=>byId[e.id]=e); saved.forEach(e=>byId[e.id]=e);
+  D.history=Object.values(byId).sort((a,b)=>a.start.localeCompare(b.start));
+}
+D.baseHistory = D.history.slice();   // keep an untouched copy of the shipped baseline
+mergeHistory();
+
+// 25 target ASINs -> SKU (Group 4). Used to consolidate uploaded reports in-browser.
+const TARGET = {
+ "B0GC5DK8CW":"KD-BABYSTACKER-051","B0FX48DHCN":"KD-SASSYSTACKER-041","B0GVK9LF4D":"KD-LIZARD-GR-027",
+ "B0GW375CMP":"KD-MGTTILES-42P-004","B0GV4FH6MV":"KD-POLICEBOOK-054","B0GVKGB7N1":"KD-ENGWORD-035",
+ "B0GVS3DX6R":"KD-NAILMARKER-082","B0GN1F7J7G":"KD-NAILMARKER-692","B0GW888T9B":"KD-DUCK-YL-004",
+ "B0F6NR3VGY":"KD-FRUITTEETHER-P5-331","B0G941M82L":"KD-FAIRYWINGS-087","B0H1H6GJG3":"KD-FLRBBBL-803",
+ "B0D7SPNLMQ":"KD-FLYINGCAR-BL-45","B0FYFZQJDD":"KD-MIRRORBOOK-WTH-D1-591","B0DRMDWVRH":"KD-5IN1-METALENGINEER-YL-53-New",
+ "B0DR8GVQ24":"KD-5IN1-METALFIRE-RD-53","B0DRVK24MF":"KD-5IN1-DINOSAUR-53","B0DRVLH61R":"KD-5IN1-CONSTRUCTION-YL-53",
+ "B0DRVJW2ZB":"KD-5IN1-FIRE-RD-53","B0D296NGGK":"KD-BUSYBOARD-DOUBLESIDE-33","B0H4B3GMRF":"KD-OCTAGON-S20",
+ "B0FX9G36HP":"KD-SMOKEDRIFTCAR-RD-093","B0FX9J89K5":"KD-CARRYBAG-BR-071","B0FX9HFVH9":"KD-CARRYBAG-YL-071",
+ "B0FX9G7PR5":"KD-CARRYBAG-BU-071"
+};
+const TARGET_ORDER = Object.keys(TARGET);
+
+// ---------- formatting ----------
+const inr = new Intl.NumberFormat('en-IN',{maximumFractionDigits:0});
+function money(n){ // compact lakh/crore for big values
+  if(n>=1e7) return '₹'+(n/1e7).toFixed(2)+'Cr';
+  if(n>=1e5) return '₹'+(n/1e5).toFixed(2)+'L';
+  return '₹'+inr.format(Math.round(n));
+}
+const num = n => inr.format(Math.round(n));
+const pct = n => (n||0).toFixed(1)+'%';
+const x = n => (n||0).toFixed(2)+'×';
+
+// ---------- derive metrics ----------
+function enrich(p){
+  const o = Object.assign({}, p);
+  o.acos = p.adSales? p.spend/p.adSales*100 : 0;
+  o.roas = p.spend? p.adSales/p.spend : 0;
+  o.tacos = p.totalSales? p.spend/p.totalSales*100 : 0;
+  o.troas = p.spend? p.totalSales/p.spend : 0;
+  o.cpc = p.clicks? p.spend/p.clicks : 0;
+  o.ctr = p.impr? p.clicks/p.impr*100 : 0;
+  o.cvr = p.clicks? p.adOrders/p.clicks*100 : 0;
+  o.adShare = p.totalSales? p.adSales/p.totalSales*100 : 0;
+  o.organic = Math.max(0, p.totalSales - p.adSales);
+  o.status = statusOf(o);
+  return o;
+}
+function statusOf(o){
+  if(o.spend>200 && o.adOrders===0) return 'alert';
+  if(o.acos>35 || o.tacos>30 || (o.spend>1000 && o.roas<2.5)) return 'alert';
+  if(o.acos>=25 || o.tacos>=20 || o.roas<4 || o.adShare>88) return 'watch';
+  if(o.acos>0 && o.acos<18 && o.roas>5.5 && o.adOrders>=5) return 'star';
+  return 'good';
+}
+function reasons(o){
+  const r=[];
+  if(o.spend>200 && o.adOrders===0) r.push(`Spent ${money(o.spend)} with 0 ad orders — pause or fix targeting.`);
+  if(o.acos>35) r.push(`ACOS ${pct(o.acos)} is well above target (${TARGET_ACOS}%).`);
+  else if(o.acos>=25) r.push(`ACOS ${pct(o.acos)} is creeping over the ${TARGET_ACOS}% target.`);
+  if(o.tacos>30) r.push(`TACOS ${pct(o.tacos)} — ads eat a large share of total revenue.`);
+  else if(o.tacos>=20) r.push(`TACOS ${pct(o.tacos)} is on the higher side.`);
+  if(o.spend>1000 && o.roas<2.5) r.push(`ROAS only ${x(o.roas)} on ${money(o.spend)} spend.`);
+  if(o.adShare>88 && o.totalSales>0) r.push(`${pct(o.adShare)} of sales come from ads — thin organic demand.`);
+  return r;
+}
+
+// ---------- state ----------
+let CUR; // current enriched product list
+function loadPeriod(id){
+  const h = D.history.find(e=>e.id===id) || D.history[D.history.length-1];
+  CUR = h.products.map(enrich);
+  document.getElementById('provNote').style.display = (h===D.history[D.history.length-1] && h.kind!=='final')?'inline-block':'none';
+  renderAll();
+}
+
+// ---------- KPIs ----------
+function sum(k){return CUR.reduce((a,p)=>a+p[k],0)}
+function renderKPIs(){
+  const spend=sum('spend'),adSales=sum('adSales'),total=sum('totalSales');
+  const acos=adSales?spend/adSales*100:0, roas=spend?adSales/spend:0;
+  const tacos=total?spend/total*100:0, troas=spend?total/spend:0;
+  const cards=[
+    ['c-spend','💸','Ad Spend',money(spend),`${num(sum('clicks'))} clicks · ${num(sum('impr'))} impr`],
+    ['c-sales','🛒','Ad Sales',money(adSales),`${num(sum('adOrders'))} ad orders`],
+    ['c-total','📈','Total Sales',money(total),`${num(sum('totalOrders'))} total orders`],
+    ['c-acos','🎯','Blended ACOS',pct(acos),`target ${TARGET_ACOS}%`],
+    ['c-roas','⚡','Ad ROAS',x(roas),'ad sales ÷ spend'],
+    ['c-tacos','🧮','TACOS',pct(tacos),'spend ÷ total sales'],
+    ['c-troas','🚀','TROAS',x(troas),'total sales ÷ spend'],
+    ['c-ord','📦','Products',String(CUR.length),'active ASINs'],
+  ];
+  document.getElementById('kpis').innerHTML = cards.map(c=>`
+    <div class="kpi ${c[0]}"><div class="lab"><span class="ic">${c[1]}</span>${c[2]}</div>
+    <div class="val">${c[3]}</div><div class="sub">${c[4]}</div></div>`).join('');
+}
+
+// ---------- charts ----------
+let charts={};
+function dead(id){ if(charts[id]){charts[id].destroy(); delete charts[id]} }
+Chart.defaults.font.family="'Inter',sans-serif";
+Chart.defaults.plugins.legend.labels.boxWidth=12;
+Chart.defaults.plugins.legend.labels.font={size:11};
+
+function renderCharts(){
+  const top=[...CUR].sort((a,b)=>b.spend-a.spend).slice(0,10);
+  const labels=top.map(p=>p.sku.replace(/^KD-/,''));
+  dead('ss');
+  charts.ss=new Chart(chSpendSales,{type:'bar',data:{labels,datasets:[
+    {label:'Spend',data:top.map(p=>p.spend),backgroundColor:'#ff6b6b',borderRadius:5},
+    {label:'Ad Sales',data:top.map(p=>p.adSales),backgroundColor:'#14b8a6',borderRadius:5}]},
+    options:{indexAxis:'y',maintainAspectRatio:false,scales:{x:{ticks:{callback:v=>money(v)}}},
+      plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+money(c.raw)}}}}});
+
+  dead('sh');
+  const share=[...CUR].sort((a,b)=>b.spend-a.spend);
+  const t6=share.slice(0,6), rest=share.slice(6).reduce((a,p)=>a+p.spend,0);
+  charts.sh=new Chart(chShare,{type:'doughnut',data:{
+    labels:[...t6.map(p=>p.sku.replace(/^KD-/,'')),'Others'],
+    datasets:[{data:[...t6.map(p=>p.spend),rest],backgroundColor:[...PALETTE.slice(0,6),'#cdd3e6'],borderWidth:2,borderColor:'#fff'}]},
+    options:{maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right'},
+      tooltip:{callbacks:{label:c=>c.label+': '+money(c.raw)}}}}});
+
+  dead('ac');
+  const byAcos=[...CUR].filter(p=>p.spend>0).sort((a,b)=>b.acos-a.acos).slice(0,12);
+  const targetLine={id:'targetLine',afterDraw(c){
+    const{ctx,chartArea:{left,right},scales:{y}}=c; if(!y)return;
+    const yy=y.getPixelForValue(TARGET_ACOS);
+    ctx.save();ctx.strokeStyle='#dc2626';ctx.setLineDash([5,4]);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(left,yy);ctx.lineTo(right,yy);ctx.stroke();
+    ctx.fillStyle='#dc2626';ctx.font='11px Inter';ctx.fillText('target '+TARGET_ACOS+'%',left+6,yy-5);ctx.restore();
+  }};
+  charts.ac=new Chart(chAcos,{type:'bar',plugins:[targetLine],
+    data:{labels:byAcos.map(p=>p.sku.replace(/^KD-/,'')),
+    datasets:[{label:'ACOS %',data:byAcos.map(p=>+p.acos.toFixed(1)),
+      backgroundColor:byAcos.map(p=>p.acos>35?'#dc2626':p.acos>=25?'#f59e0b':'#22c55e'),borderRadius:5}]},
+    options:{maintainAspectRatio:false,scales:{y:{ticks:{callback:v=>v+'%'}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'ACOS '+pct(c.raw)}}}}});
+
+  dead('ao');
+  const ad=sum('adSales'), org=CUR.reduce((a,p)=>a+p.organic,0);
+  charts.ao=new Chart(chAdOrg,{type:'doughnut',data:{labels:['Ad-driven','Organic'],
+    datasets:[{data:[ad,org],backgroundColor:['#6c4ce0','#22c55e'],borderWidth:2,borderColor:'#fff'}]},
+    options:{maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom'},
+      tooltip:{callbacks:{label:c=>c.label+': '+money(c.raw)}}}}});
+}
+// ---------- products table ----------
+let sortK='spend', sortDir=-1, filt='all';
+function renderTable(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  let rows=CUR.filter(p=>(p.sku+p.asin).toLowerCase().includes(q));
+  if(filt!=='all') rows=rows.filter(p=> filt==='good'?(p.status==='good'||p.status==='star'):p.status===filt);
+  rows.sort((a,b)=>{const av=a[sortK],bv=b[sortK];
+    return (typeof av==='string'?av.localeCompare(bv):av-bv)*sortDir;});
+  const bmap={star:['b-star','★ Star'],good:['b-good','Healthy'],watch:['b-watch','Watch'],alert:['b-alert','Alert']};
+  document.getElementById('pbody').innerHTML = rows.map(p=>{
+    const b=bmap[p.status];
+    const ch=p.channels.map(c=>`<span class="chan ${c}">${c}</span>`).join('');
+    return `<tr>
+      <td class="l"><div class="prod"><span class="sku">${p.sku.replace(/^KD-/,'')}${ch}</span><span class="asin">${p.asin}</span></div></td>
+      <td>${money(p.spend)}</td><td>${money(p.adSales)}</td><td>${num(p.adOrders)}</td>
+      <td style="color:${p.acos>35?'#dc2626':p.acos>=25?'#d97706':'#16a34a'};font-weight:600">${p.acos?pct(p.acos):'–'}</td>
+      <td>${p.roas?x(p.roas):'–'}</td>
+      <td>${money(p.totalSales)}</td><td>${num(p.totalOrders)}</td>
+      <td>${p.tacos?pct(p.tacos):'–'}</td><td>${p.troas?x(p.troas):'–'}</td>
+      <td class="l"><span class="badge ${b[0]}">${b[1]}</span></td></tr>`;
+  }).join('') || `<tr><td colspan="11" style="text-align:center;padding:26px;color:#888">No products match.</td></tr>`;
+  document.querySelectorAll('thead th').forEach(th=>th.classList.toggle('sorted',th.dataset.k===sortK));
+}
+
+// ---------- insights ----------
+function renderInsights(){
+  const spend=sum('spend'),adSales=sum('adSales'),total=sum('totalSales');
+  const acos=adSales?spend/adSales*100:0, tacos=total?spend/total*100:0;
+  const top=[...CUR].sort((a,b)=>b.totalSales-a.totalSales)[0];
+  const worst=[...CUR].filter(p=>p.spend>500).sort((a,b)=>b.acos-a.acos)[0];
+  const eff=[...CUR].filter(p=>p.adOrders>3).sort((a,b)=>a.acos-b.acos)[0];
+  document.getElementById('portfolioRead').textContent =
+    `Across ${CUR.length} products you spent ${money(spend)} to drive ${money(adSales)} in ad sales `+
+    `(blended ACOS ${pct(acos)}), contributing to ${money(total)} total revenue at ${pct(tacos)} TACOS. `+
+    `${top?`"${top.sku.replace(/^KD-/,'')}" is your revenue leader. `:''}`+
+    `${eff?`Most efficient ad spend: "${eff.sku.replace(/^KD-/,'')}" at ${pct(eff.acos)} ACOS. `:''}`+
+    `${worst?`Biggest efficiency drag: "${worst.sku.replace(/^KD-/,'')}" at ${pct(worst.acos)} ACOS.`:''}`;
+
+  const picks=[];
+  if(eff) picks.push(['🏆','Scale this winner',`"${eff.sku.replace(/^KD-/,'')}" converts at just ${pct(eff.acos)} ACOS (${x(eff.roas)} ROAS). Room to raise bids/budget.`,eff]);
+  if(worst) picks.push(['🔧','Fix efficiency',`"${worst.sku.replace(/^KD-/,'')}" runs ${pct(worst.acos)} ACOS on ${money(worst.spend)}. Tighten targets / negative keywords.`,worst]);
+  if(top) picks.push(['💰','Revenue leader',`"${top.sku.replace(/^KD-/,'')}" drives ${money(top.totalSales)} total sales at ${pct(top.tacos)} TACOS — protect this listing.`,top]);
+  const organicStar=[...CUR].filter(p=>p.totalSales>5000).sort((a,b)=>a.adShare-b.adShare)[0];
+  if(organicStar) picks.push(['🌱','Strong organic',`"${organicStar.sku.replace(/^KD-/,'')}" gets only ${pct(organicStar.adShare)} of sales from ads — healthy organic demand.`,organicStar]);
+  document.getElementById('insGrid').innerHTML = picks.map(p=>{
+    const o=p[3];
+    return `<div class="ins"><h4>${p[0]} ${p[1]}</h4><p>${p[2]}</p>
+      <div class="mini"><div><b>${money(o.spend)}</b><span>Spend</span></div>
+      <div><b>${pct(o.acos)}</b><span>ACOS</span></div>
+      <div><b>${x(o.roas)}</b><span>ROAS</span></div>
+      <div><b>${money(o.totalSales)}</b><span>Total Sales</span></div></div></div>`;
+  }).join('');
+}
+
+// ---------- alerts ----------
+function renderAlerts(){
+  const flagged=CUR.map(p=>({p,r:reasons(p)})).filter(o=>o.r.length).sort((a,b)=>
+    (b.p.status==='alert')-(a.p.status==='alert') || b.p.spend-a.p.spend);
+  const n=flagged.filter(o=>o.p.status==='alert').length;
+  document.getElementById('alertCount').textContent = flagged.length?`(${flagged.length})`:'';
+  document.getElementById('alertWrap').innerHTML = flagged.length? `
+    <div class="card" style="margin-bottom:14px"><h3>${flagged.length} products need a look</h3>
+      <p class="hint">${n} urgent · ${flagged.length-n} to watch. Thresholds: ACOS>${TARGET_ACOS}%, TACOS>20%, ROAS<4, or spend with no orders.</p></div>
+    <div class="alert-list">`+ flagged.map(o=>`
+      <div class="alert-card lv-${o.p.status==='alert'?'alert':'watch'}">
+        <div class="top"><div><div class="sku">${o.p.sku.replace(/^KD-/,'')}</div>
+        <div style="font-size:11px;color:#999">${o.p.asin}</div></div>
+        <span class="badge ${o.p.status==='alert'?'b-alert':'b-watch'}">${o.p.status==='alert'?'Alert':'Watch'}</span></div>
+        <ul>${o.r.map(t=>`<li>${t}</li>`).join('')}</ul></div>`).join('')+`</div>`
+    : `<div class="empty">✅ No products breaching thresholds in this period. All healthy!</div>`;
+}
+
+// ---------- compare ----------
+function renderCompare(){
+  const H=D.history, wrap=document.getElementById('cmpWrap');
+  if(H.length<2){
+    wrap.innerHTML=`<div class="note">
+      <h3>🔀 Comparison engine — ready & waiting for data</h3>
+      <p>You asked for <b>day-by-day, week-by-week, 10-day, 15-day and month-by-month</b> comparisons. These need
+      multiple time points. Right now there is <b>one baseline period (${H[0].label})</b> loaded.</p>
+      <p>Every time you upload a new day's data, it's added here automatically — and these comparisons start populating:
+      first day-vs-day, then week-vs-week, then 10/15-day and monthly as the history fills in.</p>
+      <p style="color:#6c4ce0;font-weight:600">Baseline locked: ${H[0].label} · ${money(H[0].products.reduce((a,p)=>a+p.totalSales,0))} total sales · ${H[0].products.length} products.</p>
+    </div>`; return;
+  }
+  // 2+ periods: A vs B selector
+  const opt=H.map(h=>`<option value="${h.id}">${h.label}</option>`).join('');
+  wrap.innerHTML=`<div class="cmp-pick">Compare
+    <select id="cmpA">${opt}</select> vs <select id="cmpB">${opt}</select></div>
+    <div class="kpis" id="cmpKpis"></div><div id="cmpTbl"></div>`;
+  const A=document.getElementById('cmpA'), B=document.getElementById('cmpB');
+  A.value=H[H.length-2].id; B.value=H[H.length-1].id;
+  const draw=()=>diffPeriods(H.find(h=>h.id===A.value),H.find(h=>h.id===B.value));
+  A.onchange=draw; B.onchange=draw; draw();
+}
+function totOf(h,k){return h.products.reduce((a,p)=>a+(p[k]||0),0)}
+function diffPeriods(a,b){
+  const m=[['Spend','spend',money],['Ad Sales','adSales',money],['Total Sales','totalSales',money],['Ad Orders','adOrders',num]];
+  const dpct=(x,y)=>y?((x-y)/y*100):0;
+  document.getElementById('cmpKpis').innerHTML=m.map(([lab,k,f])=>{
+    const av=totOf(a,k),bv=totOf(b,k),d=dpct(bv,av);
+    const cls=Math.abs(d)<0.5?'flat':d>0?'up':'down', arrow=d>0?'▲':d<0?'▼':'■';
+    return `<div class="kpi c-total"><div class="lab">${lab}</div>
+      <div class="val">${f(bv)}</div><div class="sub"><span class="delta ${cls}">${arrow} ${Math.abs(d).toFixed(1)}%</span> vs ${f(av)}</div></div>`;
+  }).join('');
+}
+
+// ---------- render orchestration ----------
+function renderAll(){ renderKPIs(); renderCharts(); renderTable(); renderInsights(); renderAlerts(); renderCompare(); }
+
+/* =========================================================================
+   IN-BROWSER UPLOAD + CONSOLIDATION  (mirrors scripts/build_data.py)
+   ========================================================================= */
+function sfNum(v){
+  if(v==null) return 0;
+  if(typeof v==='number') return isFinite(v)?v:0;
+  const n=parseFloat(String(v).replace(/[₹,]/g,'').replace(/rs/ig,'').trim());
+  return isNaN(n)?0:n;
+}
+function findCol(headers, ...subs){
+  for(const h of headers){ const hl=String(h).toLowerCase(); if(subs.every(s=>hl.includes(s.toLowerCase()))) return h; }
+  return null;
+}
+function detectRole(name){
+  const n=name.toUpperCase();
+  if(n.includes('BUSINESSREPORT')||n.includes('BUSINESS REPORT')||n.includes('BUSINESS-REPORT')) return {type:'BR',acct:'Both'};
+  let type = n.startsWith('SP')?'SP':n.startsWith('SB')?'SB':n.startsWith('SD')?'SD':
+             n.includes('SPONSORED PRODUCT')?'SP':n.includes('SPONSORED BRAND')?'SB':n.includes('SPONSORED DISPLAY')?'SD':null;
+  const acct = n.includes('KIDO')?'KIDO':n.includes('HC')?'HC':'?';
+  return type?{type,acct}:null;
+}
+const ROLE_DEFS=[['SP','HC'],['SP','KIDO'],['SB','HC'],['SB','KIDO'],['SD','HC'],['SD','KIDO'],['BR','Both']];
+let STAGED={}; // key 'SP|HC' -> {name, parsed}
+
+function readFile(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onerror=()=>rej(new Error('read failed: '+file.name));
+    r.onload=e=>{
+      try{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+        res({rows, headers: rows.length?Object.keys(rows[0]):[]});
+      }catch(err){ rej(err); }
+    };
+    r.readAsArrayBuffer(file);
+  });
+}
+function consolidate(staged){
+  const P={}; TARGET_ORDER.forEach(a=>P[a]={asin:a,sku:TARGET[a],title:'',spend:0,adSales:0,adOrders:0,impr:0,clicks:0,totalSales:0,totalOrders:0,channels:new Set()});
+  const warn=[];
+  const addAdvertised=(parsed,channel)=>{
+    if(!parsed) return; const H=parsed.headers;
+    const cA=findCol(H,'advertised','asin'),cS=findCol(H,'spend'),cSal=findCol(H,'total sales','₹'),
+          cOrd=findCol(H,'total orders','#'),cImp=findCol(H,'impressions'),cClk=findCol(H,'clicks');
+    parsed.rows.forEach(r=>{ const a=String(r[cA]||'').trim(); if(P[a]){
+      P[a].spend+=sfNum(r[cS]); P[a].adSales+=sfNum(r[cSal]); P[a].adOrders+=sfNum(r[cOrd]);
+      P[a].impr+=sfNum(r[cImp]); P[a].clicks+=sfNum(r[cClk]); P[a].channels.add(channel); }});
+  };
+  const addSB=(parsed)=>{
+    if(!parsed) return; const H=parsed.headers;
+    const cC=findCol(H,'campaign name'),cS=findCol(H,'spend'),cSal=findCol(H,'total sales','₹'),
+          cOrd=findCol(H,'total orders','#'),cImp=findCol(H,'impressions'),cClk=findCol(H,'clicks');
+    parsed.rows.forEach(r=>{ const camp=String(r[cC]||'');
+      let found=TARGET_ORDER.filter(a=>camp.includes(a)); if(!found.length) found=TARGET_ORDER.filter(a=>camp.includes(TARGET[a]));
+      if(found.length===1){ const a=found[0];
+        P[a].spend+=sfNum(r[cS]); P[a].adSales+=sfNum(r[cSal]); P[a].adOrders+=sfNum(r[cOrd]);
+        P[a].impr+=sfNum(r[cImp]); P[a].clicks+=sfNum(r[cClk]); P[a].channels.add('SB');
+      } else if(found.length>1 && sfNum(r[cS])>0){ warn.push('SB multi-ASIN campaign skipped: '+camp.slice(0,40)); }
+    });
+  };
+  addAdvertised(staged['SP|HC'],'SP'); addAdvertised(staged['SP|KIDO'],'SP');
+  addAdvertised(staged['SD|HC'],'SD'); addAdvertised(staged['SD|KIDO'],'SD');
+  addSB(staged['SB|HC']); addSB(staged['SB|KIDO']);
+  const br=staged['BR|Both'];
+  if(br){ const H=br.headers, cChild=findCol(H,'(child) asin')||findCol(H,'child','asin'),
+          cTitle=findCol(H,'title'),cOPS=findCol(H,'ordered product sales'),cTOI=findCol(H,'total order items');
+    br.rows.forEach(r=>{ const a=String(r[cChild]||'').trim(); if(P[a]){
+      P[a].totalSales+=sfNum(r[cOPS]); P[a].totalOrders+=Math.round(sfNum(r[cTOI]));
+      if(!P[a].title && String(r[cTitle]||'').trim()) P[a].title=String(r[cTitle]).trim(); }});
+  }
+  const products=TARGET_ORDER.map(a=>{const d=P[a];
+    return {...d, adOrders:Math.round(d.adOrders), impr:Math.round(d.impr), clicks:Math.round(d.clicks), channels:[...d.channels].sort()};});
+  return {products, warn, hasBR:!!br};
+}
+
+function ulog(msg,cls){ const el=document.getElementById('ulog'); el.classList.add('show');
+  el.innerHTML+=`<div class="${cls||''}">${msg}</div>`; el.scrollTop=el.scrollHeight; }
+function renderRoles(){
+  document.getElementById('roles').innerHTML=ROLE_DEFS.map(([t,a])=>{
+    const k=t+'|'+a, s=STAGED[k], lbl=t==='BR'?'Business':t, sub=t==='BR'?'Report':a;
+    return `<div class="role ${s?'ok':'miss'}"><div class="rt">${lbl}</div><div style="font-size:10px;color:#888">${sub}</div>
+      <div class="rs">${s?'✅':'⬜'}</div><div class="fn">${s?s.name:''}</div></div>`;
+  }).join('');
+  const any=Object.keys(STAGED).length>0;
+  document.getElementById('processBtn').disabled=!any;
+}
+async function stageFiles(fileList){
+  for(const f of fileList){
+    const role=detectRole(f.name);
+    if(!role){ ulog('⚠️ Could not recognise "'+f.name+'" — name it like SP_..._HC / SB_..._KIDO / BusinessReport...','w'); continue; }
+    const k=role.type+'|'+(role.type==='BR'?'Both':role.acct);
+    if(role.type!=='BR' && role.acct==='?'){ ulog('⚠️ "'+f.name+'": can\'t tell HC vs KIDO from the name — rename to include HC or KIDO.','w'); continue; }
+    try{ const parsed=await readFile(f); STAGED[k]={name:f.name,...parsed};
+      ulog('✓ '+f.name+' → '+k.replace('|',' ')+' ('+parsed.rows.length+' rows)'); }
+    catch(err){ ulog('✗ '+f.name+': '+err.message,'e'); }
+  }
+  renderRoles();
+}
+function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function processStaged(){
+  if(!Object.keys(STAGED).length){ ulog('Nothing staged yet.','e'); return; }
+  const {products,warn,hasBR}=consolidate(STAGED);
+  const tSpend=products.reduce((a,p)=>a+p.spend,0), tAd=products.reduce((a,p)=>a+p.adSales,0), tTot=products.reduce((a,p)=>a+p.totalSales,0);
+  if(tSpend===0){ ulog('✗ No matching ad spend found — are these the right files / 25 ASINs?','e'); return; }
+  if(!hasBR) ulog('Note: no Business Report uploaded → Total Sales / TACOS / TROAS will be blank for this entry.','w');
+  warn.forEach(w=>ulog('• '+w,'w'));
+  const start=document.getElementById('uStart').value||todayISO();
+  const end=document.getElementById('uEnd').value||start;
+  const kind=document.getElementById('uKind').value;
+  const label=document.getElementById('uLabel').value.trim()|| (start===end?start:start+'→'+end);
+  const id=start===end?start:start+'_'+end;
+  const entry={id,label,start,end,kind,products};
+  // persist + merge
+  let saved=[]; try{saved=JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch(e){}
+  saved=saved.filter(e=>e.id!==id); saved.push(entry); localStorage.setItem(LS_KEY,JSON.stringify(saved));
+  mergeHistory();
+  ulog('✅ Added "'+label+'": Spend '+money(tSpend)+' · Ad Sales '+money(tAd)+(hasBR?' · Total '+money(tTot):'')+'  ('+products.length+' products)');
+  STAGED={}; renderRoles();
+  refreshPeriodSelector(); document.getElementById('periodSel').value=id; loadPeriod(id);
+  ulog('Switched dashboard to this entry. Open the Overview / Compare tabs to see it.');
+}
+function downloadData(){
+  const payload={brand:D.brand,meta:{...D.meta,generatedAt:todayISO(),latestId:D.history[D.history.length-1].id},history:D.history};
+  const txt='// Auto-generated — replace data/data.js on your host to publish.\nwindow.DASHBOARD_DATA = '+JSON.stringify(payload,null,1)+';\n';
+  const blob=new Blob([txt],{type:'text/javascript'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='data.js'; a.click(); URL.revokeObjectURL(url);
+}
+function resetData(){
+  if(!confirm('Remove all uploaded data and return to the June 1–20 baseline?')) return;
+  localStorage.removeItem(LS_KEY); mergeHistory(); refreshPeriodSelector();
+  loadPeriod(D.history[D.history.length-1].id);
+  document.getElementById('ulog').classList.remove('show'); document.getElementById('ulog').innerHTML='';
+}
+
+function refreshPeriodSelector(){
+  const latest=D.history[D.history.length-1];
+  document.getElementById('freshness').textContent='Updated '+latest.end;
+  const sel=document.getElementById('periodSel');
+  sel.innerHTML=D.history.map(h=>`<option value="${h.id}">${h.label} (${h.start} → ${h.end})</option>`).join('');
+  sel.value=latest.id;
+}
+
+// ---------- wiring ----------
+function init(){
+  document.getElementById('mgr').textContent=D.brand.manager;
+  const latest=D.history[D.history.length-1];
+  refreshPeriodSelector();
+  document.getElementById('periodSel').onchange=e=>loadPeriod(e.target.value);
+
+  // ---- upload wiring ----
+  const drop=document.getElementById('drop'), fi=document.getElementById('fileInput');
+  drop.onclick=()=>fi.click();
+  fi.onchange=e=>{ stageFiles(e.target.files); fi.value=''; };
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>{ if(e.dataTransfer&&e.dataTransfer.files) stageFiles(e.dataTransfer.files); });
+  document.getElementById('processBtn').onclick=processStaged;
+  document.getElementById('downloadBtn').onclick=downloadData;
+  document.getElementById('resetBtn').onclick=resetData;
+  document.getElementById('uStart').value=latest.end;
+  renderRoles();
+
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(z=>z.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(z=>z.classList.remove('active'));
+    t.classList.add('active'); document.getElementById('v-'+t.dataset.v).classList.add('active');
+  });
+  document.getElementById('search').oninput=renderTable;
+  document.querySelectorAll('#statusFilter button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#statusFilter button').forEach(z=>z.classList.remove('on'));
+    b.classList.add('on'); filt=b.dataset.f; renderTable();
+  });
+  document.querySelectorAll('thead th').forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k; if(k==='status')return;
+    if(sortK===k) sortDir*=-1; else {sortK=k; sortDir=(k==='sku')?1:-1;}
+    renderTable();
+  });
+  loadPeriod(latest.id);
+}
+if(D&&D.history&&D.history.length) init();
+else document.body.innerHTML='<div style="padding:40px;font-family:sans-serif">No data found. Run <code>python scripts/build_data.py</code> first.</div>';
+</script>
+</body>
+</html>
