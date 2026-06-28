@@ -50,6 +50,26 @@
   .customrow{display:flex;align-items:center;gap:7px;margin-top:11px;border-top:1px solid var(--line);padding-top:11px;flex-wrap:wrap}
   .customrow input{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--ink)}
   .customrow .apply{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer}
+  .customrow{display:block}
+  .cal{width:300px}
+  .cal-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:9px}
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+  .cal-nav button{border:1px solid var(--line);background:#fff;border-radius:8px;width:30px;height:28px;cursor:pointer;font-size:15px;color:var(--ink)}
+  .cal-nav span{font-family:'Poppins';font-weight:700;font-size:13.5px}
+  .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
+  .cal-dow span{text-align:center;font-size:10px;color:var(--muted);font-weight:700}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .cal-cell{height:32px;display:flex;align-items:center;justify-content:center;font-size:12.5px;border-radius:7px;cursor:pointer;color:var(--ink)}
+  .cal-cell:hover{background:#eef2ff}
+  .cal-cell.empty{visibility:hidden;cursor:default}
+  .cal-cell.disabled{color:#cbd2de;cursor:not-allowed;background:none}
+  .cal-cell.inrange{background:#dbe6fb;border-radius:0}
+  .cal-cell.end1{background:var(--blue);color:#fff;border-radius:7px 0 0 7px}
+  .cal-cell.end2{background:var(--blue);color:#fff;border-radius:0 7px 7px 0}
+  .cal-cell.single{background:var(--blue);color:#fff}
+  .cal-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+  .cal-foot #calSel{font-size:12px;color:var(--ink);font-weight:600}
+  .apply:disabled{opacity:.45;cursor:not-allowed}
 
   nav.tabs{position:sticky;top:0;z-index:30;background:rgba(243,245,248,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
   .tabs-in{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;max-width:1180px;margin:0 auto;scrollbar-width:none}
@@ -97,6 +117,14 @@
   .b-watch{background:#fff4e3;color:var(--watch)} .b-alert{background:#fdeaea;color:var(--alert)}
   .delx{margin-left:8px;border:none;background:#f1f3f7;color:#9aa3b2;width:20px;height:20px;border-radius:5px;cursor:pointer;font-size:14px;line-height:1;vertical-align:middle}
   .delx:hover{background:#fde8e8;color:#dc2626}
+  .topline{background:linear-gradient(120deg,#11243f,#1b3a63);color:#fff;border-radius:var(--r);padding:14px 18px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .topline .tl-head{font-family:'Poppins';font-weight:700;font-size:14px;display:flex;align-items:center;gap:10px;margin-bottom:11px}
+  .topline .tl-range{font-size:11px;font-weight:600;background:rgba(255,255,255,.15);padding:3px 9px;border-radius:999px}
+  .tl-stats{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
+  .tl-stats>div{display:flex;flex-direction:column;gap:2px;border-left:2px solid rgba(255,255,255,.15);padding-left:10px}
+  .tl-stats .tv{font-family:'Poppins';font-weight:700;font-size:16px;line-height:1.1}
+  .tl-stats .tk{font-size:10px;opacity:.8;text-transform:uppercase;letter-spacing:.3px}
+  @media(max-width:880px){.tl-stats{grid-template-columns:repeat(4,1fr)}}
   .chan{display:inline-block;font-size:9.5px;font-weight:700;color:#fff;border-radius:5px;padding:1px 5px;margin-left:4px}
   .chan.SP{background:var(--blue)} .chan.SB{background:var(--purple)} .chan.SD{background:var(--teal)}
 
@@ -113,6 +141,10 @@
   .ctype.PT{background:#eafaf3;color:#15803d} .ctype.Exact{background:#fff2e0;color:#b45309}
   .ctype.Manual{background:#eef0f7;color:#4b57a8} .ctype.SB{background:#ede9fe;color:#6d28d9}
   .pendline{padding:9px 16px;font-size:11.5px;color:var(--muted);background:#fffdf5}
+  .camp-head .addcamp{border:1px solid #cdd9f5;background:#fff;color:var(--blue);border-radius:8px;padding:5px 11px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;margin-left:8px}
+  .camp-row .cn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cstatus{margin-left:auto;border:none;border-radius:999px;padding:4px 12px;font:inherit;font-size:10.5px;font-weight:700;cursor:pointer;text-transform:capitalize;min-width:64px}
+  .cstatus.s-active{background:#e7f8ee;color:#15803d} .cstatus.s-paused{background:#fff4e3;color:#b45309} .cstatus.s-draft{background:#eef0f7;color:#64748b}
 
   .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
   .stat{background:#fff;border-radius:13px;padding:14px 15px;box-shadow:var(--shadow);border:1px solid var(--line);border-top:3px solid var(--c,#94a3b8)}
@@ -155,9 +187,13 @@
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Quick ranges</div>
         <div class="presets" id="presets"></div>
         <div class="customrow">
-          <span style="font-size:12px;color:var(--muted);font-weight:600">Custom</span>
-          <input type="date" id="cStart" /><span style="color:var(--muted)">→</span><input type="date" id="cEnd" />
-          <button class="apply" id="cApply">Apply</button>
+          <div class="cal">
+            <div class="cal-label">Custom range — click a start date, then an end date</div>
+            <div class="cal-nav"><button type="button" id="calPrev">‹</button><span id="calTitle"></span><button type="button" id="calNext">›</button></div>
+            <div class="cal-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-foot"><span id="calSel">Pick a start date…</span><button class="apply" id="calApply" disabled>Apply</button></div>
+          </div>
         </div>
       </div>
     </div>
@@ -197,6 +233,7 @@
       <div class="fsel" style="padding:0;border:none;background:none"><select class="fsel" id="statusFilter"><option value="all">All status</option><option value="alert">Needs attention</option><option value="watch">Watch</option><option value="good">Healthy</option></select></div>
       <button class="mini-btn" id="addProdBtn">+ Add product</button>
     </div>
+    <div id="topline"></div>
     <div class="tablewrap"><table id="ptable"><thead><tr>
       <th class="l" data-k="sku">Product</th><th data-k="adSales">Ad Sales</th><th data-k="spend">Ad Spend</th>
       <th data-k="adOrders">Ad Orders</th><th data-k="adUnits">Ad Units</th><th data-k="acos">Ad ACOS</th><th data-k="roas">Ad ROAS</th>
@@ -413,8 +450,19 @@ function renderOverviewCharts(){
 }
 
 // ---------- PRODUCTS ----------
+function renderTopline(){
+  const adS=sum('adSales'),sp=sum('spend'),tS=sum('totalSales');
+  const roas=sp?adS/sp:0,tacos=tS?sp/tS*100:0;
+  const active=CUR.filter(p=>p.spend>0||p.totalSales>0).length;
+  const stats=[['Ad Sales',money(adS)],['Ad Spend',money(sp)],['Ad ROAS',x(roas)],['Ad Units',num(sum('adUnits'))],
+    ['Total Sales',money(tS)],['Total Orders',num(sum('totalOrders'))],['Total Units',num(sum('totalUnits'))],['TACOS',tS?pct(tacos):'–']];
+  document.getElementById('topline').innerHTML=
+    `<div class="topline"><div class="tl-head">📊 Top Line Performance<span class="tl-range">${RANGE.label} · ${active} active products</span></div>
+     <div class="tl-stats">`+stats.map(s=>`<div><span class="tv">${s[1]}</span><span class="tk">${s[0]}</span></div>`).join('')+`</div></div>`;
+}
 let sortK='totalSales',sortDir=-1,filt='all';
 function renderProducts(){
+  renderTopline();
   const q=(document.getElementById('search').value||'').toLowerCase();
   let rows=CUR.filter(p=>(p.name+p.sku+p.asin).toLowerCase().includes(q));
   if(filt!=='all') rows=rows.filter(p=>filt==='good'?(p.status==='good'||p.status==='star'):p.status===filt);
@@ -434,16 +482,28 @@ function renderProducts(){
 // ---------- CAMPAIGNS (names + counts only) ----------
 function campType(n){const s=n.toLowerCase();if(s.includes('video'))return'Video';if(/\bpt\b|self pt|product target/.test(s))return'PT';if(s.includes('auto'))return'Auto';if(s.includes('exact'))return'Exact';if(s.startsWith('sb_')||s.startsWith('sb-'))return'SB';if(s.includes('manual'))return'Manual';return'KWD';}
 function fillCampProd(){const names=[...new Set(CAMPAIGN_GROUPS.map(g=>g.p))];document.getElementById('campProd').innerHTML='<option value="all">All products</option>'+names.map(n=>`<option>${n}</option>`).join('');}
+const CAMP_KEY='kidology_campaigns_v1';
+function getCampState(){try{return JSON.parse(localStorage.getItem(CAMP_KEY))||{status:{},added:{}};}catch(e){return{status:{},added:{}};}}
+function saveCampState(s){localStorage.setItem(CAMP_KEY,JSON.stringify(s));}
+function cycleCamp(name){const s=getCampState();const nx={active:'paused',paused:'draft',draft:'active'}[s.status[name]||'active'];s.status[name]=nx;saveCampState(s);renderCampaigns();}
+function addCampaign(prod){const n=(prompt('New campaign name for "'+prod+'":')||'').trim();if(!n)return;const s=getCampState();(s.added[prod]=s.added[prod]||[]).push(n);saveCampState(s);renderCampaigns();}
 function renderCampaigns(){
+  const st=getCampState();
   const q=(document.getElementById('campSearch').value||'').toLowerCase(),pf=document.getElementById('campProd').value||'all';
-  const groups=CAMPAIGN_GROUPS.filter(g=>pf==='all'||g.p===pf);
-  const totC=CAMPAIGN_GROUPS.reduce((a,g)=>a+g.c.length,0);
+  const all=CAMPAIGN_GROUPS.map(g=>({p:g.p,a:g.a,camps:[...g.c,...(st.added[g.p]||[])]}));
+  let total=0,live=0; all.forEach(g=>g.camps.forEach(n=>{total++; if((st.status[n]||'active')==='active')live++;}));
+  const groups=all.filter(g=>pf==='all'||g.p===pf);
   document.getElementById('campWrap').innerHTML=
-    `<div class="card" style="margin-bottom:12px"><h3>Campaigns by product</h3><p class="hint">${totC} campaigns across ${CAMPAIGN_GROUPS.length} product lines. Names &amp; structure only.</p></div>`+
-    groups.map(g=>{const camps=g.c.filter(n=>(n+g.p).toLowerCase().includes(q));if(!camps.length)return'';
-      return `<div class="camp-group"><div class="camp-head"><span class="pname">${g.p}</span><span class="pasin">${g.a.join(', ')}</span><span class="pcount">${g.c.length} campaigns</span></div>`+
-        camps.map(n=>{const t=campType(n);return `<div class="camp-row"><span class="ctype ${t}">${t}</span><span>${n}</span></div>`;}).join('')+
-        (g.pend?`<div class="pendline">⏳ Pending / planned: ${g.pend}</div>`:'')+`</div>`;}).join('');
+    `<div class="card" style="margin-bottom:12px"><h3>Campaigns by product</h3>
+     <p class="hint"><b style="color:var(--green)">${live} live</b> · ${total-live} paused/draft · ${total} total across ${CAMPAIGN_GROUPS.length} products. Tap a status to cycle Active → Paused → Draft.</p></div>`+
+    groups.map(g=>{const camps=g.camps.filter(n=>(n+g.p).toLowerCase().includes(q));
+      const liveG=g.camps.filter(n=>(st.status[n]||'active')==='active').length;
+      return `<div class="camp-group"><div class="camp-head"><span class="pname">${g.p}</span><span class="pasin">${g.a.join(', ')}</span>
+        <span class="pcount">${liveG}/${g.camps.length} live</span><button class="addcamp" data-prod="${g.p}">+ Campaign</button></div>`+
+        camps.map(n=>{const t=campType(n),stt=st.status[n]||'active';
+          return `<div class="camp-row"><span class="ctype ${t}">${t}</span><span class="cn">${n}</span>
+            <button class="cstatus s-${stt}" data-camp="${encodeURIComponent(n)}">${stt}</button></div>`;}).join('')+
+        `</div>`;}).join('');
 }
 
 // ---------- FORECAST (month-wise total sales) ----------
@@ -459,14 +519,18 @@ function renderForecast(){
   const[y,mm]=fcMonth.split('-').map(Number); const dim=new Date(y,mm,0).getDate();
   const vals=ser.map(d=>d[key]); const n=vals.length;
   const soFar=vals.reduce((a,b)=>a+b,0);
-  const last7=vals.slice(-7); const rr=last7.length?last7.reduce((a,b)=>a+b,0)/last7.length:0;
-  const remain=Math.max(0,dim-n); const next7=rr*7; const close=soFar+rr*remain;
+  // run-rate is driven by the currently-selected date range (top bar)
+  const rangeDays=daysBetween(RANGE.start,RANGE.end);
+  const rangeTotal=CUR.reduce((a,p)=>a+(p.totalSales||0),0), rangeAd=CUR.reduce((a,p)=>a+(p.adSales||0),0);
+  const rrBase=useTotal?(rangeTotal||rangeAd):rangeAd;
+  const rr=rangeDays?rrBase/rangeDays:0;
+  const remain=Math.max(0,dim-n); const close=soFar+rr*remain;
   const isCurrent=fcMonth===LATEST.slice(0,7);
   document.getElementById('fcBoxes').innerHTML=[
     ['#0e8f86','Sales so far ('+MON[mm-1]+' 1–'+n+')',money(soFar),(useTotal?'total store sales':'ad sales')+' · data till '+prettyShort(LATEST)],
-    ['#2563eb','Projected next 7 days',money(next7),'at '+money(rr)+'/day run-rate'],
-    ['#36417e','Projected '+MON[mm-1]+' close',isCurrent?money(close):money(soFar),isCurrent?'+'+remain+' days to go':'month complete'],
-    ['#c98a2b','Daily run-rate',money(rr),'avg of last 7 days'],
+    ['#36417e','Projected '+MON[mm-1]+' close',isCurrent?money(close):money(soFar),isCurrent?'+'+remain+' days left · '+money(rr)+'/day':'month complete'],
+    ['#c98a2b','Daily run-rate',money(rr),'from '+RANGE.label+' · '+rangeDays+' days'],
+    ['#1f7fb6','Selected-range sales',money(rrBase),RANGE.label],
   ].map(b=>`<div class="stat" style="--c:${b[0]}"><div class="t">${b[1]}</div><div class="p">${b[2]}</div><div class="d">${b[3]}</div></div>`).join('');
   // chart
   dead('fc');
@@ -592,6 +656,35 @@ function renderCompare(){
 // ---------- orchestrate ----------
 function renderAll(){renderOverview();renderProducts();renderCampaigns();renderForecast();renderSummary();renderAlerts();renderCompare();}
 
+// ---------- custom-range calendar (click start, then end) ----------
+let calMonth=LATEST.slice(0,7), calS=null, calE=null;
+function renderCal(){
+  const[y,m]=calMonth.split('-').map(Number);
+  document.getElementById('calTitle').textContent=MON[m-1]+' '+y;
+  const first=new Date(y,m-1,1), dim=new Date(y,m,0).getDate(), offset=(first.getDay()+6)%7;
+  let html='';
+  for(let i=0;i<offset;i++) html+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=calMonth+'-'+String(d).padStart(2,'0'); const disabled=ds<FIRST||ds>LATEST;
+    let cls='cal-cell';
+    if(disabled) cls+=' disabled';
+    else if(calS&&calE){ if(ds===calS&&ds===calE)cls+=' single'; else if(ds===calS)cls+=' end1'; else if(ds===calE)cls+=' end2'; else if(ds>calS&&ds<calE)cls+=' inrange'; }
+    else if(calS&&ds===calS) cls+=' single';
+    html+=`<div class="${cls}" data-d="${ds}">${d}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML=html;
+  const sel=document.getElementById('calSel'), ap=document.getElementById('calApply');
+  if(calS&&calE){ sel.textContent=prettyShort(calS)+' → '+prettyShort(calE)+' · '+daysBetween(calS,calE)+' days'; ap.disabled=false; }
+  else if(calS){ sel.textContent=prettyShort(calS)+' → pick end date…'; ap.disabled=false; }
+  else { sel.textContent='Pick a start date…'; ap.disabled=true; }
+}
+function calClick(ds){
+  if(!calS || (calS&&calE)){ calS=ds; calE=null; }
+  else { if(ds>=calS) calE=ds; else { calE=calS; calS=ds; } }
+  renderCal();
+}
+function calShift(dir){ const[y,m]=calMonth.split('-').map(Number); let nm=m+dir,ny=y; if(nm<1){nm=12;ny--;} if(nm>12){nm=1;ny++;} calMonth=ny+'-'+String(nm).padStart(2,'0'); renderCal(); }
+
 // ---------- init ----------
 function init(){
   if(window.LOGOS) document.getElementById('brandLogo').src=LOGOS.kidology;
@@ -599,10 +692,13 @@ function init(){
   document.getElementById('freshness').textContent='Data till '+prettyShort(LATEST);
   document.getElementById('presets').innerHTML=PRESETS.map(p=>`<button data-label="${p[0]}" data-key="${p[1]}">${p[0]}</button>`).join('');
   document.querySelectorAll('#presets button').forEach(b=>b.onclick=()=>{const[s,e]=presetRange(isNaN(+b.dataset.key)?b.dataset.key:+b.dataset.key);setRange(s,e,b.dataset.label);document.getElementById('dpanel').classList.remove('open');});
-  document.getElementById('dateChip').onclick=e=>{e.stopPropagation();document.getElementById('dpanel').classList.toggle('open');};
+  document.getElementById('dateChip').onclick=e=>{e.stopPropagation();const dp=document.getElementById('dpanel');const opening=!dp.classList.contains('open');dp.classList.toggle('open');if(opening){calS=null;calE=null;renderCal();}};
   document.addEventListener('click',e=>{if(!document.getElementById('dpanel').contains(e.target)&&e.target.id!=='dateChip')document.getElementById('dpanel').classList.remove('open');});
-  document.getElementById('cStart').value=presetRange('tm')[0]; document.getElementById('cEnd').value=LATEST;
-  document.getElementById('cApply').onclick=()=>{const s=document.getElementById('cStart').value,e=document.getElementById('cEnd').value;if(s&&e){setRange(s>e?e:s,s>e?s:e,'Custom');document.getElementById('dpanel').classList.remove('open');}};
+  document.getElementById('calPrev').onclick=()=>calShift(-1);
+  document.getElementById('calNext').onclick=()=>calShift(1);
+  document.getElementById('calGrid').addEventListener('click',e=>{const c=e.target.closest('.cal-cell');if(c&&c.dataset.d&&!c.classList.contains('disabled')&&!c.classList.contains('empty'))calClick(c.dataset.d);});
+  document.getElementById('calApply').onclick=()=>{if(calS){setRange(calS,calE||calS,'Custom');document.getElementById('dpanel').classList.remove('open');}};
+  renderCal();
   // tabs
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(z=>z.classList.remove('active'));document.querySelectorAll('.view').forEach(z=>z.classList.remove('active'));t.classList.add('active');document.getElementById('v-'+t.dataset.v).classList.add('active');});
   // products
@@ -615,6 +711,10 @@ function init(){
   fillCampProd();
   document.getElementById('campSearch').oninput=renderCampaigns;
   document.getElementById('campProd').onchange=renderCampaigns;
+  document.getElementById('campWrap').addEventListener('click',e=>{
+    const cs=e.target.closest('.cstatus'); if(cs){cycleCamp(decodeURIComponent(cs.dataset.camp));return;}
+    const ac=e.target.closest('.addcamp'); if(ac){addCampaign(ac.dataset.prod);}
+  });
   // forecast months
   document.getElementById('fcMonths').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b){fcMonth=b.dataset.m;renderForecast();}});
   // default range = this month (latest month to date)
