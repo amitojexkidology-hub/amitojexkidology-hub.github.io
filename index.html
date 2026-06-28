@@ -51,22 +51,21 @@
   .customrow input{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--ink)}
   .customrow .apply{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer}
   .customrow{display:block}
-  .cal{width:300px}
-  .cal-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:9px}
-  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+  .cal{width:266px;margin:0 auto}
+  .cal-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:10px;text-align:center}
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
   .cal-nav button{border:1px solid var(--line);background:#fff;border-radius:8px;width:30px;height:28px;cursor:pointer;font-size:15px;color:var(--ink)}
+  .cal-nav button:hover{background:#eef2ff}
   .cal-nav span{font-family:'Poppins';font-weight:700;font-size:13.5px}
-  .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
-  .cal-dow span{text-align:center;font-size:10px;color:var(--muted);font-weight:700}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-  .cal-cell{height:32px;display:flex;align-items:center;justify-content:center;font-size:12.5px;border-radius:7px;cursor:pointer;color:var(--ink)}
+  .cal-dow{display:grid;grid-template-columns:repeat(7,34px);gap:4px;margin-bottom:5px;justify-content:center}
+  .cal-dow span{text-align:center;font-size:10.5px;color:var(--muted);font-weight:700}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,34px);gap:4px;justify-content:center}
+  .cal-cell{width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:12.5px;border-radius:8px;cursor:pointer;color:var(--ink)}
   .cal-cell:hover{background:#eef2ff}
   .cal-cell.empty{visibility:hidden;cursor:default}
   .cal-cell.disabled{color:#cbd2de;cursor:not-allowed;background:none}
-  .cal-cell.inrange{background:#dbe6fb;border-radius:0}
-  .cal-cell.end1{background:var(--blue);color:#fff;border-radius:7px 0 0 7px}
-  .cal-cell.end2{background:var(--blue);color:#fff;border-radius:0 7px 7px 0}
-  .cal-cell.single{background:var(--blue);color:#fff}
+  .cal-cell.inrange{background:#dbe6fb}
+  .cal-cell.end1,.cal-cell.end2,.cal-cell.single{background:var(--blue);color:#fff;font-weight:700}
   .cal-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
   .cal-foot #calSel{font-size:12px;color:var(--ink);font-weight:600}
   .apply:disabled{opacity:.45;cursor:not-allowed}
@@ -443,10 +442,13 @@ function renderOverviewCharts(){
     options:{maintainAspectRatio:false,scales:{y:{ticks:{callback:v=>v+'%'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>v+'×'}}},
       plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.dataset.yAxisID==='y1'?x(c.raw):pct(c.raw))}}}}});
   dead('adorg');
-  const ad=sum('adSales'),org=CUR.reduce((a,p)=>a+p.organic,0),tot=sum('totalSales');
+  const ad=sum('adSales'),org=CUR.reduce((a,p)=>a+p.organic,0),tot=sum('totalSales'),den=(ad+org)||1;
+  const adPct=ad/den*100, orgPct=org/den*100;
   const center={id:'ct',afterDraw(c){const{ctx,chartArea}=c;if(!chartArea)return;const cx=(chartArea.left+chartArea.right)/2,cy=(chartArea.top+chartArea.bottom)/2;ctx.save();ctx.textAlign='center';ctx.fillStyle='#64748b';ctx.font='11px Inter';ctx.fillText('Total sales',cx,cy-10);ctx.fillStyle='#0f1b2d';ctx.font='700 17px Poppins';ctx.fillText(money(tot),cx,cy+12);ctx.restore();}};
   charts.adorg=new Chart(chAdOrg,{type:'doughnut',plugins:[center],data:{labels:['Ad-driven','Organic'],datasets:[{data:[ad,org],backgroundColor:['#2563eb','#1f9d57'],borderWidth:2,borderColor:'#fff'}]},
-    options:{maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.label+': '+money(c.raw)}}}}});
+    options:{maintainAspectRatio:false,cutout:'68%',plugins:{
+      legend:{position:'bottom',labels:{font:{size:12},generateLabels:ch=>{const d=ch.data.datasets[0].data,bg=ch.data.datasets[0].backgroundColor;return ch.data.labels.map((l,i)=>({text:l+'  '+(d[i]/den*100).toFixed(0)+'%',fillStyle:bg[i],strokeStyle:bg[i],lineWidth:0,index:i}));}}},
+      tooltip:{callbacks:{label:c=>c.label+': '+money(c.raw)+' ('+(c.raw/den*100).toFixed(1)+'%)'}}}}});
 }
 
 // ---------- PRODUCTS ----------
@@ -693,7 +695,8 @@ function init(){
   document.getElementById('presets').innerHTML=PRESETS.map(p=>`<button data-label="${p[0]}" data-key="${p[1]}">${p[0]}</button>`).join('');
   document.querySelectorAll('#presets button').forEach(b=>b.onclick=()=>{const[s,e]=presetRange(isNaN(+b.dataset.key)?b.dataset.key:+b.dataset.key);setRange(s,e,b.dataset.label);document.getElementById('dpanel').classList.remove('open');});
   document.getElementById('dateChip').onclick=e=>{e.stopPropagation();const dp=document.getElementById('dpanel');const opening=!dp.classList.contains('open');dp.classList.toggle('open');if(opening){calS=null;calE=null;renderCal();}};
-  document.addEventListener('click',e=>{if(!document.getElementById('dpanel').contains(e.target)&&e.target.id!=='dateChip')document.getElementById('dpanel').classList.remove('open');});
+  document.getElementById('dpanel').addEventListener('click',e=>e.stopPropagation()); // keep panel open while picking dates
+  document.addEventListener('click',()=>document.getElementById('dpanel').classList.remove('open'));
   document.getElementById('calPrev').onclick=()=>calShift(-1);
   document.getElementById('calNext').onclick=()=>calShift(1);
   document.getElementById('calGrid').addEventListener('click',e=>{const c=e.target.closest('.cal-cell');if(c&&c.dataset.d&&!c.classList.contains('disabled')&&!c.classList.contains('empty'))calClick(c.dataset.d);});
