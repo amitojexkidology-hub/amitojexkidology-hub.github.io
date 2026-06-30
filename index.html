@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
     --bg:#f3f5f8; --card:#fff; --ink:#0f1b2d; --muted:#64748b; --line:#e4e8ef;
@@ -165,6 +166,53 @@
   .cmp-pick .cust{display:none;align-items:center;gap:6px}
   .foot{margin-top:22px;text-align:center;font-size:11.5px;color:var(--muted)}
   @media(max-width:880px){.kpis,.stat-grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+
+  /* ---- edit mode + gating ---- */
+  .editbtn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:6px 13px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:9px}
+  .editbtn:hover{background:rgba(255,255,255,.24)}
+  .editbtn.on{background:#1f9d57;border-color:#1f9d57}
+  body:not(.edit-on) .edit-only{display:none!important}
+  body:not(.edit-on) .cstatus{cursor:default}
+  /* ---- pin modal ---- */
+  .pin-back{position:fixed;inset:0;background:rgba(8,15,28,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:200;padding:18px}
+  .pin-back.open{display:flex}
+  .pin-card{background:#fff;border-radius:18px;padding:24px 22px 20px;width:300px;max-width:100%;box-shadow:0 24px 70px rgba(0,0,0,.4);position:relative;text-align:center}
+  .pin-x{position:absolute;top:9px;right:13px;border:none;background:none;font-size:23px;color:#9aa3b2;cursor:pointer;line-height:1}
+  .pin-title{font-family:'Poppins';font-weight:700;font-size:17px;color:var(--ink)}
+  .pin-sub{font-size:12px;color:var(--muted);margin-top:4px}
+  .pin-dots{display:flex;gap:11px;justify-content:center;margin:18px 0 4px}
+  .pin-dots span{width:13px;height:13px;border-radius:50%;border:2px solid #cbd5e1;transition:.12s}
+  .pin-dots span.f{background:var(--blue);border-color:var(--blue)}
+  .pin-card.err .pin-dots{animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+  .pin-err{font-size:12px;color:var(--alert);height:16px;margin:4px 0;font-weight:600}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+  .pin-pad button{font:inherit;font-size:20px;font-weight:700;font-family:'Poppins';color:var(--ink);background:#f3f5f9;border:1px solid var(--line);border-radius:12px;padding:13px 0;cursor:pointer}
+  .pin-pad button:hover{background:#eef2ff}
+  .pin-pad button.ghost{background:none;border:none;cursor:default}
+  /* ---- upload ---- */
+  .up-grid{display:grid;grid-template-columns:1.3fr .9fr;gap:14px}
+  @media(max-width:880px){.up-grid{grid-template-columns:1fr}}
+  .drop{border:2px dashed #c4d0e6;border-radius:14px;background:#fff;padding:30px 18px;text-align:center;cursor:pointer;transition:.15s}
+  .drop:hover,.drop.drag{border-color:var(--blue);background:#f5f8ff}
+  .drop .big{font-family:'Poppins';font-weight:700;font-size:16px;color:var(--ink)}
+  .drop .sm{font-size:12.5px;color:var(--muted);margin-top:5px}
+  .up-files{display:grid;gap:8px}
+  .up-file{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 12px;font-size:13px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .up-file .fn{font-weight:600;flex:1;min-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .up-file .tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px}
+  .up-file .tag.SP{background:#e8f1ff;color:#2563eb}.up-file .tag.SB{background:#ede9fe;color:#6d28d9}
+  .up-file .tag.BR{background:#eafaf3;color:#15803d}.up-file .tag.skip{background:#fdeaea;color:#b91c1c}
+  .up-file input[type=date]{font:inherit;font-size:12px;border:1px solid var(--line);border-radius:7px;padding:5px 7px;color:var(--ink)}
+  .up-file .meta{font-size:11.5px;color:var(--muted)}
+  .up-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .up-actions button{font:inherit;font-weight:700;font-size:13px;border:1px solid transparent;border-radius:11px;padding:11px 16px;cursor:pointer}
+  .up-apply{background:var(--blue);color:#fff}.up-apply:disabled{opacity:.45;cursor:not-allowed}
+  .up-reset{background:#fff;border-color:var(--line)!important;color:var(--ink)}
+  .up-dl{background:#11243f;color:#fff}
+  .up-note{font-size:12px;color:#6b5b2a;line-height:1.55;background:#fffdf5;border:1px solid #f0e6c8;border-radius:11px;padding:11px 13px}
+  .up-ok{background:#e7f8ee;border:1px solid #bfe6cd;color:#15803d;border-radius:11px;padding:11px 13px;font-size:13px;font-weight:600;line-height:1.5}
+  .up-bad{background:#fdeaea;border:1px solid #f3c2c2;color:#b91c1c;border-radius:11px;padding:11px 13px;font-size:13px;font-weight:600}
 </style>
 </head>
 <body>
@@ -174,6 +222,7 @@
       <div class="logo-chip"><img id="brandLogo" alt="Kidology" /></div>
       <div><div class="hero-sub">Amazon Ads · Performance Dashboard</div></div>
       <div class="hero-meta">
+        <button id="editToggle" class="editbtn"><span id="editIcon">🔒</span><span id="editLabel">View only</span></button>
         <div class="mlabel">Account manager</div>
         <div class="mname" id="mgr">Amitoje Singh Bakshi</div>
         <div class="pill"><span class="dot"></span><span id="freshness">Data till —</span></div>
@@ -207,6 +256,7 @@
   <button class="tab" data-v="summary">Summary</button>
   <button class="tab" data-v="alerts">Alerts</button>
   <button class="tab" data-v="compare">Compare</button>
+  <button class="tab edit-only" data-v="upload">⬆ Upload data</button>
 </div></nav>
 
 <main class="wrap">
@@ -230,7 +280,7 @@
     <div class="toolbar">
       <input class="search" id="search" placeholder="Search product / SKU / ASIN…" />
       <div class="fsel" style="padding:0;border:none;background:none"><select class="fsel" id="statusFilter"><option value="all">All status</option><option value="alert">Needs attention</option><option value="watch">Watch</option><option value="good">Healthy</option></select></div>
-      <button class="mini-btn" id="addProdBtn">+ Add product</button>
+      <button class="mini-btn edit-only" id="addProdBtn">+ Add product</button>
     </div>
     <div id="topline"></div>
     <div class="tablewrap"><table id="ptable"><thead><tr>
@@ -265,8 +315,48 @@
 
   <section class="view" id="v-compare"><div id="cmpWrap"></div></section>
 
+  <section class="view edit-only" id="v-upload">
+    <div class="up-grid">
+      <div class="card">
+        <h3>Upload data</h3>
+        <p class="hint">Drop your daily Amazon files — the dashboard parses them, recalculates every metric, and updates itself. SP &amp; SB reports (.xlsx) carry the date inside; for each Business Report (.csv) just pick the date it belongs to.</p>
+        <div class="drop" id="drop">
+          <div class="big">📂 Drop files here, or tap to choose</div>
+          <div class="sm">SP / SB report (.xlsx) · Business Report (.csv) · multiple files at once is fine</div>
+          <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" style="display:none" />
+        </div>
+        <div class="up-files" id="upFiles" style="margin-top:12px"></div>
+        <div class="up-actions">
+          <button class="up-apply" id="upApply" disabled>Apply &amp; recalculate</button>
+          <button class="up-reset" id="upClear">Clear selection</button>
+        </div>
+        <div id="upResult" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <h3>Publish &amp; reset</h3>
+        <p class="hint">Uploaded data is saved on this device and recalculates instantly here. To push it to everyone who opens the shared link, download the data file and re-publish (or ask me to wire a live sync so it updates for everyone automatically).</p>
+        <div class="up-actions">
+          <button class="up-dl" id="upDownload">⬇ Download updated data file</button>
+          <button class="up-reset" id="upBaseline">↺ Reset to published baseline</button>
+        </div>
+        <div class="up-note" style="margin-top:12px"><b>Heads-up:</b> the editor passcode is a light lock to stop viewers from changing things — it lives inside the page, so it isn't bank-grade security. Want true owner-only sync where your uploads appear for everyone automatically? I can wire a free live backend whenever you like.</div>
+      </div>
+    </div>
+  </section>
+
   <div class="foot">Kidology · Amazon Ads dashboard for Amitoje Singh Bakshi · daily SP + SB data (SD not in daily breakdown) · figures in ₹.</div>
 </main>
+
+<div class="pin-back" id="pinModal">
+  <div class="pin-card" id="pinCard">
+    <button class="pin-x" id="pinClose">×</button>
+    <div class="pin-title">Editor access</div>
+    <div class="pin-sub">Enter the 6-digit passcode to upload &amp; edit</div>
+    <div class="pin-dots" id="pinDots"></div>
+    <div class="pin-err" id="pinErr"></div>
+    <div class="pin-pad" id="pinPad"></div>
+  </div>
+</div>
 
 <script>
 // brand logos as data URIs
@@ -281,11 +371,26 @@ window.DASHBOARD_DATA = {"brand":{"name":"Kidology","manager":"Amitoje Singh Bak
 <script>
 /* Kidology Ads Dashboard — daily-aggregation app */
 const D = window.DASHBOARD_DATA;
-const DAYS = (D.days||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+const BASE_DAYS = (D.days||[]).slice();
 const SKU = D.skus||{}; const PNAME = D.productNames||{};
 const ORDER = Object.keys(SKU);
-const LATEST = D.meta.latestDate || (DAYS.length?DAYS[DAYS.length-1].date:'2026-06-26');
-const FIRST = DAYS.length?DAYS[0].date:'2026-05-01';
+const TSET = new Set(ORDER);
+// uploaded data overlays the published baseline (per-device, localStorage)
+const DATA_KEY='kidology_data_v1';
+function loadOverride(){try{return JSON.parse(localStorage.getItem(DATA_KEY))||{};}catch(e){return{};}}
+function saveOverride(o){try{localStorage.setItem(DATA_KEY,JSON.stringify(o));}catch(e){alert('Could not save upload — device storage is full.');}}
+let DAYS=[], LATEST='', FIRST='';
+function rebuildDays(){
+  const ov=loadOverride(), map={};
+  BASE_DAYS.forEach(d=>{map[d.date]={date:d.date,products:d.products};});
+  Object.keys(ov).forEach(date=>{map[date]={date,products:ov[date]};});
+  DAYS=Object.values(map).sort((a,b)=>a.date.localeCompare(b.date));
+  LATEST=DAYS.length?DAYS[DAYS.length-1].date:((D.meta&&D.meta.latestDate)||'2026-06-26');
+  FIRST=DAYS.length?DAYS[0].date:'2026-05-01';
+}
+rebuildDays();
+function sf(v){ if(v==null)return 0; const n=parseFloat(String(v).replace(/[,₹\s]/g,'').replace(/Rs/i,'')); return isNaN(n)?0:n; }
+function round2(n){return Math.round((n||0)*100)/100;}
 const TARGET_ACOS = 25;
 const PALETTE=['#2563eb','#0e8f86','#4b57a8','#c98a2b','#1f7fb6','#1f9d57','#8a4f9e','#d4564b','#475569','#0ea5b7'];
 if(window.TARGET===undefined) window.TARGET = Object.assign({}, SKU); // for portfolio additions
@@ -476,7 +581,7 @@ function renderProducts(){
       <td style="color:${p.acos>35?'#b91c1c':p.acos>=25?'#b45309':'#15803d'};font-weight:600">${p.acos?pct(p.acos):'–'}</td>
       <td>${p.roas?x(p.roas):'–'}</td><td>${money(p.totalSales)}</td><td>${num(p.totalOrders)}</td><td>${num(p.totalUnits)}</td>
       <td>${p.tacos?pct(p.tacos):'–'}</td><td>${p.troas?x(p.troas):'–'}</td>
-      <td class="l"><span class="badge ${b[0]}">${b[1]}</span><button class="delx" data-asin="${p.asin}" title="Remove">×</button></td></tr>`;
+      <td class="l"><span class="badge ${b[0]}">${b[1]}</span><button class="delx edit-only" data-asin="${p.asin}" title="Remove">×</button></td></tr>`;
   }).join('')||`<tr><td colspan="13" style="text-align:center;padding:24px;color:#888">No products match.</td></tr>`;
   document.querySelectorAll('#ptable thead th').forEach(th=>th.classList.toggle('sorted',th.dataset.k===sortK));
 }
@@ -487,8 +592,8 @@ function fillCampProd(){const names=[...new Set(CAMPAIGN_GROUPS.map(g=>g.p))];do
 const CAMP_KEY='kidology_campaigns_v1';
 function getCampState(){try{return JSON.parse(localStorage.getItem(CAMP_KEY))||{status:{},added:{}};}catch(e){return{status:{},added:{}};}}
 function saveCampState(s){localStorage.setItem(CAMP_KEY,JSON.stringify(s));}
-function cycleCamp(name){const s=getCampState();const nx={active:'paused',paused:'draft',draft:'active'}[s.status[name]||'active'];s.status[name]=nx;saveCampState(s);renderCampaigns();}
-function addCampaign(prod){const n=(prompt('New campaign name for "'+prod+'":')||'').trim();if(!n)return;const s=getCampState();(s.added[prod]=s.added[prod]||[]).push(n);saveCampState(s);renderCampaigns();}
+function cycleCamp(name){if(!EDIT)return;const s=getCampState();const nx={active:'paused',paused:'draft',draft:'active'}[s.status[name]||'active'];s.status[name]=nx;saveCampState(s);renderCampaigns();}
+function addCampaign(prod){if(!EDIT){openPin();return;}const n=(prompt('New campaign name for "'+prod+'":')||'').trim();if(!n)return;const s=getCampState();(s.added[prod]=s.added[prod]||[]).push(n);saveCampState(s);renderCampaigns();}
 function renderCampaigns(){
   const st=getCampState();
   const q=(document.getElementById('campSearch').value||'').toLowerCase(),pf=document.getElementById('campProd').value||'all';
@@ -497,11 +602,11 @@ function renderCampaigns(){
   const groups=all.filter(g=>pf==='all'||g.p===pf);
   document.getElementById('campWrap').innerHTML=
     `<div class="card" style="margin-bottom:12px"><h3>Campaigns by product</h3>
-     <p class="hint"><b style="color:var(--green)">${live} live</b> · ${total-live} paused/draft · ${total} total across ${CAMPAIGN_GROUPS.length} products. Tap a status to cycle Active → Paused → Draft.</p></div>`+
+     <p class="hint"><b style="color:var(--green)">${live} live</b> · ${total-live} paused/draft · ${total} total across ${CAMPAIGN_GROUPS.length} products. ${EDIT?'Tap a status to cycle Active → Paused → Draft.':'Unlock editing (top-right) to change campaign status.'}</p></div>`+
     groups.map(g=>{const camps=g.camps.filter(n=>(n+g.p).toLowerCase().includes(q));
       const liveG=g.camps.filter(n=>(st.status[n]||'active')==='active').length;
       return `<div class="camp-group"><div class="camp-head"><span class="pname">${g.p}</span><span class="pasin">${g.a.join(', ')}</span>
-        <span class="pcount">${liveG}/${g.camps.length} live</span><button class="addcamp" data-prod="${g.p}">+ Campaign</button></div>`+
+        <span class="pcount">${liveG}/${g.camps.length} live</span><button class="addcamp edit-only" data-prod="${g.p}">+ Campaign</button></div>`+
         camps.map(n=>{const t=campType(n),stt=st.status[n]||'active';
           return `<div class="camp-row"><span class="ctype ${t}">${t}</span><span class="cn">${n}</span>
             <button class="cstatus s-${stt}" data-camp="${encodeURIComponent(n)}">${stt}</button></div>`;}).join('')+
@@ -720,10 +825,14 @@ function init(){
   });
   // forecast months
   document.getElementById('fcMonths').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b){fcMonth=b.dataset.m;renderForecast();}});
+  // editor mode + upload
+  initEditUI();
   // default range = this month (latest month to date)
   const[s,e]=presetRange('tm'); setRange(s,e,'This month');
+  _inited=true;
 }
 function addProduct(){
+  if(!EDIT){openPin();return;}
   let asin=(prompt('New product ASIN (e.g. B0ABC12345):')||'').trim().toUpperCase();if(!asin)return;
   if(!/^B0[A-Z0-9]{8}$/.test(asin)&&!confirm('"'+asin+'" doesn\'t look like a standard ASIN. Add anyway?'))return;
   const sku=((prompt('Short name / SKU for '+asin+':')||asin).trim())||asin;
@@ -732,8 +841,177 @@ function addProduct(){
   if(!SKU[asin]){SKU[asin]=sku;ORDER.push(asin);PNAME[asin]=sku;}
   setRange(RANGE.start,RANGE.end,RANGE.label);
 }
-function deleteProduct(asin){const p=CUR.find(x=>x.asin===asin);if(!confirm('Remove "'+(p?p.name:asin)+'" from the dashboard?'))return;
+function deleteProduct(asin){if(!EDIT){openPin();return;}const p=CUR.find(x=>x.asin===asin);if(!confirm('Remove "'+(p?p.name:asin)+'" from the dashboard?'))return;
   const pf=getPF();pf.added=(pf.added||[]).filter(a=>a.asin!==asin);if(!(pf.hidden||[]).includes(asin))(pf.hidden=pf.hidden||[]).push(asin);savePF(pf);setRange(RANGE.start,RANGE.end,RANGE.label);}
+
+/* ===================== EDITOR MODE (passcode) + IN-BROWSER UPLOAD ===================== */
+const PASS='221423', EDIT_KEY='kidology_edit_v1';
+let EDIT=false, _inited=false;
+function applyEditClass(){
+  document.body.classList.toggle('edit-on',EDIT);
+  const t=document.getElementById('editToggle');
+  if(t){t.classList.toggle('on',EDIT);
+    document.getElementById('editIcon').textContent=EDIT?'🔓':'🔒';
+    document.getElementById('editLabel').textContent=EDIT?'Editing — tap to lock':'View only';}
+}
+function setEdit(on){
+  EDIT=on; if(on)sessionStorage.setItem(EDIT_KEY,'1'); else sessionStorage.removeItem(EDIT_KEY);
+  applyEditClass();
+  if(!on){const av=document.querySelector('.view.active'); if(av&&av.id==='v-upload'){const ov=document.querySelector('.tab[data-v="overview"]'); if(ov)ov.click();}}
+  if(_inited&&RANGE.start) renderAll();
+}
+
+// ---- PIN keypad ----
+let pinBuf='';
+function buildPad(){const pad=document.getElementById('pinPad');if(!pad)return;
+  const keys=['1','2','3','4','5','6','7','8','9','','0','⌫'];
+  pad.innerHTML=keys.map(k=>k===''?'<button class="ghost" disabled></button>':`<button data-k="${k}">${k}</button>`).join('');}
+function renderDots(){const d=document.getElementById('pinDots');if(!d)return;
+  d.innerHTML=Array.from({length:6},(_,i)=>`<span class="${i<pinBuf.length?'f':''}"></span>`).join('');}
+function openPin(){pinBuf='';renderDots();const e=document.getElementById('pinErr');if(e)e.textContent='';
+  document.getElementById('pinModal').classList.add('open');}
+function closePin(){document.getElementById('pinModal').classList.remove('open');}
+function pinPress(k){
+  if(k==='⌫'){pinBuf=pinBuf.slice(0,-1);renderDots();return;}
+  if(pinBuf.length>=6)return;
+  pinBuf+=k;renderDots();
+  if(pinBuf.length===6){
+    if(pinBuf===PASS){closePin();setEdit(true);const ut=document.querySelector('.tab[data-v="upload"]');if(ut)ut.click();}
+    else{const c=document.getElementById('pinCard');c.classList.add('err');
+      document.getElementById('pinErr').textContent='Wrong passcode — try again';
+      setTimeout(()=>{c.classList.remove('err');pinBuf='';renderDots();},460);}
+  }
+}
+
+// ---- file parsing (mirrors scripts/build_daily.py) ----
+function isoDate(v){ if(v==null)return'';
+  if(v instanceof Date)return v.getFullYear()+'-'+String(v.getMonth()+1).padStart(2,'0')+'-'+String(v.getDate()).padStart(2,'0');
+  const s=String(v).trim(); let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m)return m[1]+'-'+m[2]+'-'+m[3];
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(m)return m[3]+'-'+m[1].padStart(2,'0')+'-'+m[2].padStart(2,'0');
+  m=s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})/); if(m)return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+  const d=new Date(s); if(!isNaN(d))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return ''; }
+function findCol(hdrs,...subs){return hdrs.find(h=>{const hl=String(h).toLowerCase();return subs.every(s=>hl.includes(s));});}
+let STAGE=[];
+function classifyAndParse(name, ws){
+  const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+  if(!rows.length) return {name,kind:'skip',reason:'empty file'};
+  const hdrs=Object.keys(rows[0]);
+  const cChild=findCol(hdrs,'child','asin'), cOPS=findCol(hdrs,'ordered product sales'), cStart=findCol(hdrs,'start date');
+  // ---- Business Report (total store sales; no internal date) ----
+  if(cChild && cOPS && !cStart){
+    const cT=findCol(hdrs,'total order items')||findCol(hdrs,'total order'), cU=findCol(hdrs,'units ordered')||findCol(hdrs,'units');
+    const per={};
+    rows.forEach(r=>{const a=String(r[cChild]||'').trim(); if(!TSET.has(a))return;
+      const e=per[a]=per[a]||{totalSales:0,totalOrders:0,totalUnits:0};
+      e.totalSales+=sf(r[cOPS]); e.totalOrders+=Math.round(sf(r[cT])); e.totalUnits+=Math.round(sf(r[cU]));});
+    return {name,kind:'BR',per,asins:Object.keys(per).length,date:LATEST};
+  }
+  // ---- SP / SB ad file (dated) ----
+  if(cStart){
+    const is_sb=/^sb/i.test(name);
+    const cS=findCol(hdrs,'spend'),
+      cSal=findCol(hdrs,'total sales','₹')||findCol(hdrs,'total sales')||findCol(hdrs,'sales','₹'),
+      cOrd=findCol(hdrs,'total orders','#')||findCol(hdrs,'total orders')||findCol(hdrs,'orders','#'),
+      cUn=findCol(hdrs,'total units','#')||findCol(hdrs,'total units')||findCol(hdrs,'units','#'),
+      cImp=findCol(hdrs,'impressions'),cClk=findCol(hdrs,'clicks'),
+      cA=findCol(hdrs,'advertised','asin'),cC=findCol(hdrs,'campaign name');
+    const out={}; let used=0; const dates={};
+    rows.forEach(r=>{const date=isoDate(r[cStart]); if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return;
+      let a;
+      if(is_sb){const camp=String(r[cC]||'');let f=ORDER.filter(x=>camp.includes(x));if(!f.length)f=ORDER.filter(x=>SKU[x]&&camp.includes(SKU[x]));if(f.length!==1)return;a=f[0];}
+      else{a=String(r[cA]||'').trim();if(!TSET.has(a))return;}
+      const e=(out[date]=out[date]||{}); const o=e[a]=e[a]||{spend:0,adSales:0,adOrders:0,adUnits:0,impr:0,clicks:0};
+      o.spend+=sf(r[cS]);o.adSales+=sf(r[cSal]);o.adOrders+=sf(r[cOrd]);o.adUnits+=sf(r[cUn]);o.impr+=sf(r[cImp]);o.clicks+=sf(r[cClk]);used++;dates[date]=1;});
+    return {name,kind:is_sb?'SB':'SP',out,rows:used,dates:Object.keys(dates).sort()};
+  }
+  return {name,kind:'skip',reason:'unrecognised columns'};
+}
+function readFiles(fileList){
+  const files=[...fileList]; let pending=files.length; if(!pending)return;
+  files.forEach(file=>{const fr=new FileReader();
+    fr.onload=ev=>{ try{const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array',cellDates:true});
+        const ws=wb.Sheets[wb.SheetNames[0]]; STAGE.push(classifyAndParse(file.name,ws));
+      }catch(err){STAGE.push({name:file.name,kind:'skip',reason:'could not read file'});}
+      if(--pending===0) renderStage(); };
+    fr.readAsArrayBuffer(file); });
+}
+function renderStage(){
+  const wrap=document.getElementById('upFiles');
+  wrap.innerHTML=STAGE.map((s,i)=>{
+    if(s.kind==='BR') return `<div class="up-file"><span class="tag BR">BR</span><span class="fn">${s.name}</span>
+        <span class="meta">${s.asins} products</span><span class="meta">Date:</span><input type="date" data-i="${i}" value="${s.date}" min="${FIRST}" /></div>`;
+    if(s.kind==='SP'||s.kind==='SB') return `<div class="up-file"><span class="tag ${s.kind}">${s.kind}</span><span class="fn">${s.name}</span>
+        <span class="meta">${s.rows} rows · ${s.dates.length?(s.dates[0]+(s.dates.length>1?' … '+s.dates[s.dates.length-1]:'')):'no valid dates'}</span></div>`;
+    return `<div class="up-file"><span class="tag skip">skip</span><span class="fn">${s.name}</span><span class="meta">${s.reason||'unrecognised'}</span></div>`;
+  }).join('');
+  wrap.querySelectorAll('input[type=date]').forEach(inp=>inp.onchange=()=>{STAGE[+inp.dataset.i].date=inp.value;});
+  document.getElementById('upApply').disabled=!STAGE.some(s=>s.kind==='SP'||s.kind==='SB'||s.kind==='BR');
+}
+function applyStage(){
+  const adAgg={}, totAgg={};
+  STAGE.forEach(s=>{
+    if(s.kind==='SP'||s.kind==='SB'){Object.keys(s.out).forEach(date=>Object.keys(s.out[date]).forEach(a=>{
+      const e=((adAgg[date]=adAgg[date]||{})[a]=adAgg[date][a]||{spend:0,adSales:0,adOrders:0,adUnits:0,impr:0,clicks:0});
+      const v=s.out[date][a]; for(const k in v) e[k]+=v[k];}));}
+    else if(s.kind==='BR'){const date=s.date; if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return;
+      Object.keys(s.per).forEach(a=>{const e=((totAgg[date]=totAgg[date]||{})[a]=totAgg[date][a]||{totalSales:0,totalOrders:0,totalUnits:0});
+        const v=s.per[a]; e.totalSales+=v.totalSales;e.totalOrders+=v.totalOrders;e.totalUnits+=v.totalUnits;});}
+  });
+  const cur={}; DAYS.forEach(d=>{cur[d.date]={};d.products.forEach(p=>cur[d.date][p.asin]={...p});});
+  const ov=loadOverride();
+  const affected=new Set([...Object.keys(adAgg),...Object.keys(totAgg)]);
+  if(!affected.size){document.getElementById('upResult').innerHTML='<div class="up-bad">No usable rows found — check the files are the right Amazon reports.</div>';return;}
+  affected.forEach(date=>{
+    const recMap={}; if(cur[date])Object.keys(cur[date]).forEach(a=>recMap[a]={...cur[date][a]});
+    if(adAgg[date])Object.keys(adAgg[date]).forEach(a=>{const r=recMap[a]||blank(a);const v=adAgg[date][a];
+      r.spend=round2(v.spend);r.adSales=round2(v.adSales);r.adOrders=Math.round(v.adOrders);r.adUnits=Math.round(v.adUnits);r.impr=Math.round(v.impr);r.clicks=Math.round(v.clicks);recMap[a]=r;});
+    if(totAgg[date])Object.keys(totAgg[date]).forEach(a=>{const r=recMap[a]||blank(a);const v=totAgg[date][a];
+      r.totalSales=round2(v.totalSales);r.totalOrders=Math.round(v.totalOrders);r.totalUnits=Math.round(v.totalUnits);recMap[a]=r;});
+    ov[date]=ORDER.filter(a=>recMap[a]).map(a=>{const r=recMap[a];return {asin:a,spend:r.spend||0,adSales:r.adSales||0,adOrders:r.adOrders||0,adUnits:r.adUnits||0,impr:r.impr||0,clicks:r.clicks||0,totalSales:r.totalSales||0,totalOrders:r.totalOrders||0,totalUnits:r.totalUnits||0};});
+  });
+  saveOverride(ov); rebuildDays();
+  document.getElementById('freshness').textContent='Data till '+prettyShort(LATEST);
+  let s=RANGE.start,e=RANGE.end; if(!s||s<FIRST)s=FIRST; if(!e||e>LATEST)e=LATEST;
+  setRange(s,e,RANGE.label||'Custom');
+  const days=[...affected].sort();
+  document.getElementById('upResult').innerHTML=`<div class="up-ok">✓ Updated ${days.length} day(s): ${days.map(prettyShort).join(', ')}.<br>All metrics recalculated. Data now reaches <b>${prettyShort(LATEST)}</b>.</div>`;
+  STAGE=[]; document.getElementById('upFiles').innerHTML=''; document.getElementById('upApply').disabled=true;
+}
+function downloadDataJs(){
+  const payload={brand:D.brand,meta:Object.assign({},D.meta,{latestDate:LATEST}),skus:SKU,productNames:PNAME,
+    days:DAYS.map(d=>({date:d.date,products:d.products}))};
+  const txt='// Auto-generated by in-browser upload ('+LATEST+')\nwindow.DASHBOARD_DATA = '+JSON.stringify(payload)+';\n';
+  const blob=new Blob([txt],{type:'text/javascript'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='data.js'; a.click(); URL.revokeObjectURL(url);
+}
+function resetBaseline(){ if(!confirm('Remove all uploaded data on this device and return to the published baseline?'))return;
+  localStorage.removeItem(DATA_KEY); rebuildDays();
+  document.getElementById('freshness').textContent='Data till '+prettyShort(LATEST);
+  let s=RANGE.start,e=RANGE.end; if(e>LATEST)e=LATEST; if(s<FIRST)s=FIRST; setRange(s,e,RANGE.label||'Custom');
+  document.getElementById('upResult').innerHTML='<div class="up-ok">Reset to the published baseline.</div>';
+}
+function initEditUI(){
+  buildPad();
+  const t=document.getElementById('editToggle'); if(t) t.onclick=()=>{ if(EDIT)setEdit(false); else openPin(); };
+  document.getElementById('pinClose').onclick=closePin;
+  document.getElementById('pinModal').addEventListener('click',e=>{if(e.target.id==='pinModal')closePin();});
+  document.getElementById('pinPad').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(b)pinPress(b.dataset.k);});
+  document.addEventListener('keydown',e=>{ if(!document.getElementById('pinModal').classList.contains('open'))return;
+    if(/^[0-9]$/.test(e.key))pinPress(e.key); else if(e.key==='Backspace')pinPress('⌫'); else if(e.key==='Escape')closePin(); });
+  const drop=document.getElementById('drop'), fi=document.getElementById('fileInput');
+  if(drop){ drop.onclick=()=>fi.click();
+    drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag');});
+    drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+    drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag');readFiles(e.dataTransfer.files);});
+    fi.onchange=()=>{readFiles(fi.files);fi.value='';}; }
+  document.getElementById('upApply').onclick=applyStage;
+  document.getElementById('upClear').onclick=()=>{STAGE=[];document.getElementById('upFiles').innerHTML='';document.getElementById('upApply').disabled=true;document.getElementById('upResult').innerHTML='';};
+  document.getElementById('upDownload').onclick=downloadDataJs;
+  document.getElementById('upBaseline').onclick=resetBaseline;
+  if(sessionStorage.getItem(EDIT_KEY)==='1') EDIT=true;
+  applyEditClass();
+}
 
 if(D&&D.days&&D.days.length) init();
 else document.body.innerHTML='<div style="padding:40px;font-family:sans-serif">No daily data found.</div>';
