@@ -389,6 +389,11 @@ function rebuildDays(){
   LATEST=DAYS.length?DAYS[DAYS.length-1].date:((D.meta&&D.meta.latestDate)||'2026-06-26');
   FIRST=DAYS.length?DAYS[0].date:'2026-05-01';
 }
+// one-time auto-heal: the published baseline is correct & complete through 29 Jun, so wipe any
+// stale per-device override left over from an earlier upload (e.g. BRs that stacked on one date).
+// Runs once per device; future uploads are unaffected. Bump the key to force another heal.
+const HEAL_KEY='kidology_heal_v2';
+try{ if(localStorage.getItem(HEAL_KEY)!=='1'){ localStorage.removeItem(DATA_KEY); localStorage.setItem(HEAL_KEY,'1'); } }catch(e){}
 rebuildDays();
 function sf(v){ if(v==null)return 0; const n=parseFloat(String(v).replace(/[,₹\s]/g,'').replace(/Rs/i,'')); return isNaN(n)?0:n; }
 function round2(n){return Math.round((n||0)*100)/100;}
