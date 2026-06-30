@@ -958,6 +958,10 @@ function renderStage(){
   document.getElementById('upApply').disabled=!STAGE.some(s=>isAdKind(s.kind)||s.kind==='BR');
 }
 function applyStage(){
+  // safety: warn if two Business Reports landed on the same date (the classic "all BRs stacked on one day" mistake)
+  const brDates=STAGE.filter(s=>s.kind==='BR').map(s=>s.date);
+  const dup=[...new Set(brDates.filter((d,i)=>brDates.indexOf(d)!==i))];
+  if(dup.length && !confirm('⚠ More than one Business Report is set to the same date ('+dup.map(prettyShort).join(', ')+').\n\nThey will be ADDED together — correct only if they are different accounts for the same day. If you assigned the wrong dates (or uploaded a report twice), click Cancel and fix the dates first.')) return;
   const adAgg={}, totAgg={};
   STAGE.forEach(s=>{
     if(isAdKind(s.kind)){Object.keys(s.out).forEach(date=>Object.keys(s.out[date]).forEach(a=>{
