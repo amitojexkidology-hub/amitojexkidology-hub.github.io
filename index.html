@@ -36,8 +36,8 @@
 
   /* date-range bar */
   .daterow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px;position:relative}
-  .datechip{display:inline-flex;align-items:center;gap:9px;background:#fff;color:var(--navy);font-weight:700;font-size:14px;border:none;border-radius:11px;padding:11px 16px;cursor:pointer;box-shadow:var(--shadow)}
-  .datechip .cal{font-size:16px}
+  .datechip{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--navy);font-weight:700;font-size:13.5px;border:none;border-radius:11px;padding:10px 15px;cursor:pointer;box-shadow:var(--shadow);white-space:nowrap}
+  .datechip .calicon{font-size:16px}
   .datechip small{font-weight:600;color:var(--muted);font-size:11.5px}
   .rangelabel{color:#fff;font-size:13px;opacity:.92}
   .rangelabel b{font-weight:700}
@@ -180,7 +180,7 @@
       </div>
     </div>
     <div class="daterow">
-      <button class="datechip" id="dateChip"><span class="cal">📅</span><span id="dateChipText">—</span><span style="opacity:.5">▾</span></button>
+      <button class="datechip" id="dateChip"><span class="calicon">📅</span><span id="dateChipText">—</span><span style="opacity:.5">▾</span></button>
       <div class="rangelabel" id="rangeLabelTop"></div>
       <div class="dpanel" id="dpanel">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Quick ranges</div>
